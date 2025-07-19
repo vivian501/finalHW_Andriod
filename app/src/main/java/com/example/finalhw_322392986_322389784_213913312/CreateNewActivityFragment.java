@@ -34,15 +34,18 @@ import java.util.Map;
 
 public class CreateNewActivityFragment extends Fragment {
 
-    private EditText titleEditText, domainEditText, descriptionEditText,
-            minAgeEditText, maxAgeEditText, maxParticipantsEditText, guideNameEditText,
+    private EditText titleEditText, descriptionEditText,
+           maxParticipantsEditText,
             daysEditText, startDateEditText, endDateEditText;
     private CheckBox mondayCheckbox, tuesdayCheckbox, wednesdayCheckbox, thursdayCheckbox,
             fridayCheckbox, saturdayCheckbox, sundayCheckbox;
-    private Spinner domainSpinner, subDomainSpinner;
+    private Spinner domainSpinner, subDomainSpinner, minAgeSpinner, maxAgeSpinner, guideSpinner;
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+
+    private Map<String, String> guideNameToUid = new HashMap<>();
+
 
     @Nullable
     @Override
@@ -60,10 +63,11 @@ public class CreateNewActivityFragment extends Fragment {
 
         titleEditText = view.findViewById(R.id.titleEditText);
         descriptionEditText = view.findViewById(R.id.descriptionEditText);
-        minAgeEditText = view.findViewById(R.id.minAgeEditText);
-        maxAgeEditText = view.findViewById(R.id.maxAgeEditText);
+        minAgeSpinner = view.findViewById(R.id.minAgeSpinner);
+        maxAgeSpinner = view.findViewById(R.id.maxAgeSpinner);
+        guideSpinner = view.findViewById(R.id.guideSpinner);
         maxParticipantsEditText = view.findViewById(R.id.maxParticipantsEditText);
-        guideNameEditText =view.findViewById(R.id.guideNameEditText);
+
 
         mondayCheckbox = view.findViewById(R.id.mondayCheckbox);
         tuesdayCheckbox = view.findViewById(R.id.tuesdayCheckbox);
@@ -83,6 +87,49 @@ public class CreateNewActivityFragment extends Fragment {
         subDomainSpinner = view.findViewById(R.id.subDomainSpinner);
 
         view.findViewById(R.id.saveActivityBtn).setOnClickListener(v -> saveActivity());
+
+        //  Populate min age spinner (12-17)
+        List<Integer> minAges = new ArrayList<>();
+        for (int i = 12; i <= 17; i++) minAges.add(i);
+        ArrayAdapter<Integer> minAgeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, minAges);
+        minAgeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        minAgeSpinner.setAdapter(minAgeAdapter);
+
+//  Populate max age spinner (13-18)
+        List<Integer> maxAges = new ArrayList<>();
+        for (int i = 13; i <= 18; i++) maxAges.add(i);
+        ArrayAdapter<Integer> maxAgeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, maxAges);
+        maxAgeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        maxAgeSpinner.setAdapter(maxAgeAdapter);
+
+// Fetch guides from Firestore and populate spinner
+        db.collection("users")
+                .whereEqualTo("userType", "Activity guide")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<String> guideNames = new ArrayList<>();
+                    guideNameToUid.clear(); // clear any previous data
+
+                    for (var doc : querySnapshot.getDocuments()) {
+                        String name = doc.getString("user name");
+                        String uid = doc.getId(); // ✅ Firestore UID
+
+                        if (name != null && uid != null) {
+                            guideNames.add(name);
+                            guideNameToUid.put(name, uid); // Map name → UID
+                        }
+                    }
+
+                    if (isAdded() && getContext() != null) {
+                        ArrayAdapter<String> guideAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, guideNames);
+                        guideAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        guideSpinner.setAdapter(guideAdapter);
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Failed to load guides: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+
+
 
         Map<String, List<String>> domainMap = new HashMap<>();
         domainMap.put("Science", Arrays.asList("biology", "robotics", "physics", "math"));
@@ -130,43 +177,47 @@ public class CreateNewActivityFragment extends Fragment {
         String selectedDomain = domainSpinner.getSelectedItem().toString();
         String selectedSubdomain = subDomainSpinner.getSelectedItem().toString();
         String description = descriptionEditText.getText().toString().trim();
-        String minAge = minAgeEditText.getText().toString().trim();
-        String maxAge = maxAgeEditText.getText().toString().trim();
         String maxParticipants = maxParticipantsEditText.getText().toString().trim();
-        String guideName = guideNameEditText.getText().toString().trim();
+        int minAge = (int) minAgeSpinner.getSelectedItem();
+        int maxAge = (int) maxAgeSpinner.getSelectedItem();
+        String guideName = guideSpinner.getSelectedItem().toString();
+        String guideUid = guideNameToUid.get(guideName);
 
-        StringBuilder daysBuilder = new StringBuilder();
-        if (mondayCheckbox.isChecked()) daysBuilder.append("Monday,");
-        if (tuesdayCheckbox.isChecked()) daysBuilder.append("Tuesday,");
-        if (wednesdayCheckbox.isChecked()) daysBuilder.append("Wednesday,");
-        if (thursdayCheckbox.isChecked()) daysBuilder.append("Thursday,");
-        if (fridayCheckbox.isChecked()) daysBuilder.append("Friday,");
-        if (saturdayCheckbox.isChecked()) daysBuilder.append("Saturday,");
-        if (sundayCheckbox.isChecked()) daysBuilder.append("Sunday,");
 
-        String days = daysBuilder.toString();
-        if (!days.isEmpty()) {
-            days = days.substring(0, days.length() - 1); // remove trailing comma
-        }
+
+
+        List<String> selectedDays = new ArrayList<>();
+        if (mondayCheckbox.isChecked()) selectedDays.add("Monday");
+        if (tuesdayCheckbox.isChecked()) selectedDays.add("Tuesday");
+        if (wednesdayCheckbox.isChecked()) selectedDays.add("Wednesday");
+        if (thursdayCheckbox.isChecked()) selectedDays.add("Thursday");
+        if (fridayCheckbox.isChecked()) selectedDays.add("Friday");
+        if (saturdayCheckbox.isChecked()) selectedDays.add("Saturday");
+        if (sundayCheckbox.isChecked()) selectedDays.add("Sunday");
+
+
+
+
 
         String startDateStr = startDateEditText.getText().toString().trim();
         String endDateStr = endDateEditText.getText().toString().trim();
 
-        if (TextUtils.isEmpty(title)  || TextUtils.isEmpty(minAge)) {
+        if (TextUtils.isEmpty(title) ) {
             Toast.makeText(getContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
         HashMap<String, Object> activity = new HashMap<>();
         activity.put("name", title);
-        activity.put("subDomain", selectedDomain );
-        activity.put("domain",selectedSubdomain);
+        activity.put("domain", selectedDomain );
+        activity.put("subDomain",selectedSubdomain);
         activity.put("description", description);
-        activity.put("minAge", Integer.parseInt(minAge));
-        activity.put("maxAge", Integer.parseInt(maxAge));
+        activity.put("minAge", minAge);
+        activity.put("maxAge", maxAge);
         activity.put("maxParticipants", Integer.parseInt(maxParticipants));
         activity.put("guideFullName", guideName);
-        activity.put("days", days);
+        activity.put("guideId", guideUid);  //  Store UID for logic
+        activity.put("days", selectedDays);
         activity.put("createdBy", auth.getCurrentUser().getUid());
 
         try {

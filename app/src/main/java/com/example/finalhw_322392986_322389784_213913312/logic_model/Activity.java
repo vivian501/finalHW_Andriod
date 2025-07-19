@@ -13,7 +13,7 @@ public class Activity {
    private String ageRange; // is this good or should i do min max age??
    private int minAge;
    private int maxAge;
-   private String days;
+   private List<String> days;
    private int maxParticipants;
    private List<String> registeredUserIds; //to store all the users signed for an activity
    private String guideId; // to save the guide that conducts the activity
@@ -76,13 +76,7 @@ public class Activity {
         this.maxAge = maxAge;
     }
 
-    public String getDays() {
-        return days;
-    }
 
-    public void setDays(String days) {
-        this.days = days;
-    }
 
     public int getMaxParticipants() {
         return maxParticipants;
@@ -152,5 +146,13 @@ public class Activity {
 
     public void setPhotos(List<String> photos) {
         Photos = photos;
+    }
+
+    public List<String> getDays() {
+        return days;
+    }
+
+    public void setDays(List<String> days) {
+        this.days = days;
     }
 }

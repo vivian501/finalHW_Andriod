@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -230,46 +231,47 @@ public class JoinActivitiesFragment extends Fragment {
     //  check if activity is relevant to student
     private boolean isActivityRelevantToStudent(Activity activity, Student student) {
         try {
-            Date endDate = activity.getEndDate();
             Date today = new Date();
-            if (endDate != null && endDate.before(today)) {
+            if (activity.getEndDate() != null && activity.getEndDate().before(today)) {
+                Log.d("FILTER", "Skipped: ended already → " + activity.getName());
                 return false;
             }
 
-            int minAge = activity.getMinAge();
-            int maxAge = activity.getMaxAge();
             int studentAge = student.getAge();
-            if (studentAge < minAge || studentAge > maxAge) {
+            if (studentAge < activity.getMinAge() || studentAge > activity.getMaxAge()) {
+                Log.d("FILTER", "Skipped: age not in range → " + activity.getName());
                 return false;
             }
 
-            String daysString = activity.getDays();
-            List<String> activityDays = new ArrayList<>();
-            if (daysString != null && !daysString.isEmpty()) {
-                String[] activityDaysArray = daysString.split(",");
-                for (String day : activityDaysArray) {
-                    activityDays.add(day.trim());
-                }
-            }
-
+            List<String> activityDays = activity.getDays();
             List<String> studentFreeDays = student.getFreeDays();
-            if (studentFreeDays != null && !studentFreeDays.isEmpty() && !activityDays.isEmpty()) {
-                boolean hasMatchingDay = false;
-                for (String day : activityDays) {
-                    if (studentFreeDays.contains(day)) {
-                        hasMatchingDay = true;
-                        break;
-                    }
-                }
-                if (!hasMatchingDay) return false;
 
+            if (activityDays == null || activityDays.isEmpty()) {
+                Log.d("FILTER", "Skipped: activity days empty → " + activity.getName());
+                return false;
             }
 
-            return true;
+            if (studentFreeDays == null || studentFreeDays.isEmpty()) {
+                Log.d("FILTER", "Skipped: student free days empty → " + student.getFullName());
+                return false;
+            }
+
+            for (String day : activityDays) {
+                if (studentFreeDays.contains(day)) {
+                    return true;
+                }
+            }
+
+            Log.d("FILTER", "Skipped: no matching days → " + activity.getName());
+            return false;
+
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("FILTER", "Error: " + e.getMessage());
             return false;
         }
     }
+
+
 
 }

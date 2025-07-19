@@ -7,7 +7,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="1000dp">
+        android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/titleEditText"
@@ -15,18 +15,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <!-- Domain -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/selectDomain"
+            android:textStyle="bold" />
+
         <Spinner
             android:id="@+id/domainCategorySpinner"
             android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <!-- Subdomain -->
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:prompt="@string/selectDomainCategory" />
+            android:text="@string/selectSubDomain"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/subDomainSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:prompt="@string/selectSubDomain" />
-
+            android:layout_height="48dp" />
 
         <EditText
             android:id="@+id/descriptionEditText"
@@ -34,19 +47,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <EditText
-            android:id="@+id/minAgeEditText"
-            android:hint="@string/minAge"
-            android:inputType="number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+        <!-- Min Age -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/minimumAge"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/maxAgeEditText"
-            android:hint="@string/maxAge"
-            android:inputType="number"
+        <Spinner
+            android:id="@+id/minAgeSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="48dp" />
+
+        <!-- Max Age -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/maximumAge"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/maxAgeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <!-- Guide -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/selectGuide"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/guideSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
 
         <EditText
             android:id="@+id/maxParticipantsEditText"
@@ -55,17 +93,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <EditText
-            android:id="@+id/guideNameEditText"
-            android:hint="@string/guideName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <!-- Day Checkboxes -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select Days:"
+            android:text="@string/selectDays"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginTop="8dp" />
@@ -139,7 +171,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/sunday" />
 
-            <!-- Empty placeholders to fill 3 columns -->
             <Space
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -150,7 +181,8 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-        <!-- Start/End Date -->
+
+        <!-- Start/End Dates -->
         <EditText
             android:id="@+id/startDateEditText"
             android:hint="@string/startDate"

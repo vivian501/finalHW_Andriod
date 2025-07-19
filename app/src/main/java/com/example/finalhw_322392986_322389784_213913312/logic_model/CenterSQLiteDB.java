@@ -132,7 +132,7 @@ public class CenterSQLiteDB extends SQLiteOpenHelper {
             a.setAgeRange(cursor.getString(4));
             a.setMinAge(cursor.getInt(5));
             a.setMaxAge(cursor.getInt(6));
-            a.setDays(cursor.getString(7));
+            a.setDays(splitList(cursor.getString(7)));
             a.setMaxParticipants(cursor.getInt(8));
             a.setRegisteredUserIds(splitList(cursor.getString(9)));
             a.setGuideId(cursor.getString(10));
@@ -168,7 +168,7 @@ public class CenterSQLiteDB extends SQLiteOpenHelper {
             values.put("ageRange", a.getAgeRange());
             values.put("minAge", a.getMinAge());
             values.put("maxAge", a.getMaxAge());
-            values.put("days", a.getDays());
+            values.put("days", joinList(a.getDays()));
             values.put("maxParticipants", a.getMaxParticipants());
             values.put("registeredUserIds", joinList(a.getRegisteredUserIds()));
             values.put("guideId", a.getGuideId());
@@ -195,7 +195,7 @@ public class CenterSQLiteDB extends SQLiteOpenHelper {
             values.put("ageRange", a.getAgeRange());
             values.put("minAge", a.getMinAge());
             values.put("maxAge", a.getMaxAge());
-            values.put("days", a.getDays());
+            values.put("days", joinList(a.getDays()));
             values.put("maxParticipants", a.getMaxParticipants());
             values.put("registeredUserIds", joinList(a.getRegisteredUserIds()));
             values.put("guideId", a.getGuideId());

@@ -167,7 +167,8 @@ public class SignupFragment extends Fragment {
 
                     //signing up as a student
                     if (userType.equalsIgnoreCase("Student")) {
-                       userData.put("student age", studentAgeSpin.getSelectedItem().toString());
+                       int age = Integer.parseInt(studentAgeSpin.getSelectedItem().toString());
+                       userData.put("age", age);
                        userData.put("freeDays", freeDays);
                        db.collection("users").document(uid).set(userData);
                        saveSessionAndNavigate(email, userName, userType);

@@ -123,16 +123,13 @@ public class BrowseActivitiesFragment extends Fragment {
 
             // Filter days if selected
             if (days != null && !days.isEmpty()) {
-                String[] activityDays = activity.getDays().split(",\\s*");
+                List<String> activityDays = activity.getDays();
                 boolean dayMatch = false;
                 for (String selectedDay : days) {
-                    for (String actDay : activityDays) {
-                        if (actDay.equalsIgnoreCase(selectedDay)) {
-                            dayMatch = true;
-                            break;
-                        }
+                    if (activityDays.contains(selectedDay)) {
+                        dayMatch = true;
+                        break;
                     }
-                    if (dayMatch) break;
                 }
                 if (!dayMatch) match = false;
             }
