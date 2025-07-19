@@ -117,6 +117,33 @@ public class JoinActivitiesFragment extends Fragment {
                         })
                         .setNegativeButton("No", null)
                         .show();
+                //saving the uids of student and joined activites here
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                for (Activity activity : selectedActivitiesPerDomain.values()) {
+                    String activityId = activity.getActivityId();
+
+
+
+                    //for storing the two values
+                    Map<String, Object> joinData = new HashMap<>();
+                    joinData.put("studentId", studentId);
+                    joinData.put("activityId", activityId);
+
+
+                    //Using a unique doc ID: studentId_activityId
+                    String docId = studentId + "_" + activityId;
+
+                    db.collection("student_activity_joins")
+                            .document(docId)
+                            .set(joinData)
+                            .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Join saved for: " + docId))
+                            .addOnFailureListener(e -> Log.e("FIRESTORE", "Failed to save join", e));
+
+
+
+                }
+
             } else {
                 Toast.makeText(requireContext(), "You must select one activity from each domain", Toast.LENGTH_SHORT).show();
             }
