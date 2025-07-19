@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name">FinalHW_322392986_322389784_213913312</string>
+    <string name="welcome">welcome to SciCenter!</string>
+    <string name="login">Login</string>
+    <string name="signup">Signup</string>
+    <string name="cancel">Cancel</string>
+    <string name="signup_form">Signup Form</string>
+    <string name="password">Enter Your Password</string>
+    <string name="password_conf">Confirm Password</string>
+    <string name="email">Enter your Email</string>
+    <string name="user_name">Enter Your UserName</string>
+    <string-array name="userTypes">
+        <item>Parent</item>
+        <item>Superintendent</item>
+        <item>Coordinator</item>
+        <item>Activity guide</item>
+        <item>Student</item>
+    </string-array>
+    <string name="loginHeader">Login Form</string>
+    <string name="kidsEmails">enter your kids emails</string>
+    <string name="CreateActivities">create new activity</string>
+    <string name="logout">Log out</string>
+    <string name="progReport">Progress Report</string>
+    <string name="browseAct">Browse Activities</string>
+    <string name="joinAct">Join Activities</string>
+    <string name="filter">Filter</string>
+    <string name="reset">Reset</string>
+    <string name="actName">Activity Name</string>
+    <string name="domainAge">Domain · Age Range</string>
+    <string name="days">Days: …</string>
+    <string name="maxParticipants">Max Participants</string>
+    <string name="guideName">Guide: …</string>
+    <string name="description">Description goes here.</string>
+    <string name="filterHeader">Select the filters you\'d like to apply.\n     You can choose more than one.</string>
+    <string name="domainFltr">Domain:</string>
+    <string name="science">Science</string>
+    <string name="social">Social</string>
+    <string name="creativity">Creativity</string>
+    <string name="daysFltr">Days:</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wen</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
+    <string name="minAge">Min Age:</string>
+    <string name="maxAge">Max Age:</string>
+    <string name="descriptionFltr">Description:</string>
+    <string name="maxParticipantsFltr">Max Participants:</string>
+    <string name="apply">Apply</string>
+    <string name="join">Join</string>
+    <string name="save">Save</string>
+    <string name="myActivities">My Monthly Activities</string>
+    <string name="delete">Delete</string>
+    <string name="title">My Monthly Activities</string>
+    <string name="joinedAct">Num Of Joined acts</string>
+    <string name="Num">0</string>
+    <string name="yourRating">Your Rating:</string>
+    <string name="avgRating">Average Rating:</string>
+    <string name="destPerDomain">Distribution Per Domain</string>
+    <string name="saveRating">Save Rating</string>
+    <string name="comment">Optional comment...</string>
+    <string name="studentName">Student Name</string>
+    <string name="rate">Rate Students</string>
+    <string name="rateOfParent">my children rating</string>
+    <string name="addPictures">"Add Pictures To Activities "</string>
+    <string name="seePictures">"see pictures of Activities "</string>
+    <string name="addPhoto">Add Photo</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="savePhoto">Save Photo</string>
+    <string name="startDate">Start Date</string>
+    <string name="endDate">End Date:</string>
+    <string name="studentAge">Student Age:</string>
+    <string name="freeDays">Select Free Days:</string>
+    <string name="domain">sports/psychology...</string>
+    <string name="SaveActivity">Save Activity</string>
+    <string name="activityTitle">title of the activity </string>
+    <string name="age">minAge-maxAge</string>
+    <string name="sunday">sunday</string>
+    <string name="monday">monday</string>
+    <string name="tuesday">tuesday</string>
+    <string name="wednesday">wednesday</string>
+    <string name="thursday">thursday</string>
+    <string name="friday">friday</string>
+    <string name="saturday">saturday</string>
+    <string name="selectDomainCategory">select Domain Category</string>
+    <string name="selectSubDomain">select Sub Domain</string>
+    <string-array name="studentAge">
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>15</item>
+        <item>17</item>
+        <item>18</item>
+    </string-array>
+
+</resources>

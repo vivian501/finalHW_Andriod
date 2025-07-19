@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:minWidth="500dp"
+        android:gravity="center_horizontal"
+       >
+
+        <TextView
+            android:id="@+id/filterHeaderTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filterHeader"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:padding="8dp"/>
+
+        <!-- Domain Section -->
+        <TextView
+            android:id="@+id/domainFilterTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/domainFltr" />
+
+        <RadioGroup
+            android:id="@+id/domainRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <RadioButton
+                android:id="@+id/radioScience"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/science" />
+
+            <RadioButton
+                android:id="@+id/radioSocial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/social" />
+
+            <RadioButton
+                android:id="@+id/radioCreativity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/creativity" />
+        </RadioGroup>
+
+        <!-- Days Section -->
+        <TextView
+            android:id="@+id/daysFilterTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/daysFltr" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/checkMon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/mon"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkTue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/tue"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/checkWed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/wed"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/checkThu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/thu"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/checkFri"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/fri"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/checkSat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/sat"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/checkSun"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/sun"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- Age Range -->
+        <TextView
+            android:id="@+id/minAgeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/minAge" />
+
+        <Spinner android:id="@+id/minAgeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/maxAgeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/maxAge" />
+        <Spinner android:id="@+id/maxAgeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!-- Max Participants -->
+        <TextView
+            android:id="@+id/maxParticipantsfltrTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/maxParticipantsFltr" />
+
+        <Spinner
+            android:id="@+id/maxPartspinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/descriptionTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/descriptionFltr" />
+        <EditText
+            android:id="@+id/descriptionEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/description" />
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/applyBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/apply"
+                android:backgroundTint="@color/green" />
+
+            <Button
+                android:id="@+id/cancleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:layout_marginStart="16dp"
+                android:backgroundTint="@color/red" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
+
+

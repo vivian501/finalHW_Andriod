@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <!-- Domain Label -->
+    <TextView
+        android:id="@+id/domainFilterTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/domainFltr"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Radio Buttons Group -->
+    <RadioGroup
+        android:id="@+id/domainRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/domainFilterTv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <RadioButton
+            android:id="@+id/radioScience"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/science" />
+
+        <RadioButton
+            android:id="@+id/radioSocial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/social" />
+
+        <RadioButton
+            android:id="@+id/radioCreativity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/creativity" />
+    </RadioGroup>
+
+    <!-- Apply Button -->
+    <Button
+        android:id="@+id/applyBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/green"
+        android:text="@string/apply"
+        app:layout_constraintEnd_toStartOf="@id/cancleBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/domainRadioGroup" />
+
+    <!-- Cancel Button -->
+    <Button
+        android:id="@+id/cancleBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:backgroundTint="@color/red"
+        app:layout_constraintTop_toBottomOf="@id/domainRadioGroup"
+        app:layout_constraintStart_toEndOf="@id/applyBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

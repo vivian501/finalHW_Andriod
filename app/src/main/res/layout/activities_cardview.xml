@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    card_view:cardCornerRadius="10dp"
+    card_view:cardElevation="6dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="332dp"
+        android:minHeight="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp">
+
+
+        <TextView
+            android:id="@+id/actNameTv"
+            android:layout_width="263dp"
+            android:layout_height="31dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/actName"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            card_view:layout_constraintBottom_toTopOf="@+id/domainTv"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent"
+            card_view:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/domainTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:text="@string/domainAge"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintBottom_toTopOf="@+id/daysTv"
+            card_view:layout_constraintStart_toStartOf="@+id/actNameTv"
+            card_view:layout_constraintTop_toBottomOf="@+id/actNameTv" />
+
+        <TextView
+            android:id="@+id/ageTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:text="@string/age"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintBottom_toTopOf="@+id/daysTv"
+            card_view:layout_constraintStart_toStartOf="@+id/domainTv"
+            card_view:layout_constraintTop_toBottomOf="@+id/domainTv" />
+
+
+        <!-- Days -->
+        <TextView
+            android:id="@+id/daysTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="@string/days"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintBottom_toTopOf="@+id/descriptionTv"
+            card_view:layout_constraintStart_toStartOf="@+id/ageTv"
+            card_view:layout_constraintTop_toBottomOf="@+id/ageTv" />
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/descriptionTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="@string/description"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintBottom_toTopOf="@+id/maxParticipantsTv"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/daysTv" />
+
+
+        <!-- Max Participants -->
+        <TextView
+            android:id="@+id/maxParticipantsTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:text="@string/maxParticipants"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintBottom_toTopOf="@+id/guideNameTv"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0.11"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/descriptionTv" />
+
+
+        <TextView
+            android:id="@+id/guideNameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:text="@string/guideName"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintBottom_toTopOf="@+id/joinBtn"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/maxParticipantsTv" />
+
+        <TextView
+            android:id="@+id/startDateTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/startDate"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintBottom_toTopOf="@+id/endDateTv"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/guideNameTv" />
+
+        <!-- End Date -->
+
+
+        <TextView
+            android:id="@+id/endDateTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/endDate"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/startDateTv" />
+
+        <Button
+            android:id="@+id/joinBtn"
+            android:layout_width="119dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="183dp"
+            android:layout_marginTop="194dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/blue"
+            android:text="@string/join"
+            card_view:layout_constraintBottom_toTopOf="@+id/deleteBtn"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toEndOf="@+id/startDateTv"
+            card_view:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/deleteBtn"
+            android:layout_width="119dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="273dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginBottom="26dp"
+            android:backgroundTint="@color/red"
+            android:text="@string/delete"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/joinBtn" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
