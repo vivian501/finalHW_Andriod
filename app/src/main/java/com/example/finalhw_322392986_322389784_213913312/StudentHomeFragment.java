@@ -2,6 +2,7 @@ package com.example.finalhw_322392986_322389784_213913312;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +33,7 @@ public class StudentHomeFragment extends Fragment {
 
         browseBtn.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, browseActFrag)
+                    .replace(R.id.fragment_container,browseActFrag)
                     .addToBackStack(null)
                     .commit();
         });
@@ -55,17 +56,23 @@ public class StudentHomeFragment extends Fragment {
 
         joinActBtn.setOnClickListener(v -> {
             Calendar now = Calendar.getInstance();
+            //only for testing reasons i added that the day is 1 , need to be deleted.
+            now.set(Calendar.DAY_OF_MONTH,1);
             int dayOfMonth = now.get(Calendar.DAY_OF_MONTH);
-            if(dayOfMonth <= 7) {
+            Log.d("JoinActivityCheck", "Day of month: " + dayOfMonth); // Add this!
+
+            if (dayOfMonth <= 7) {
+                Log.d("JoinActivityCheck", "Allowed to join.");
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, joinActFrag)
                         .addToBackStack(null)
                         .commit();
-            }
-            else {
+            } else {
+                Log.d("JoinActivityCheck", "Too late to join.");
                 Toast.makeText(requireContext(), "You can only join activities in the first week of the month, come back next month!", Toast.LENGTH_LONG).show();
             }
         });
+
 
         return view;
     }

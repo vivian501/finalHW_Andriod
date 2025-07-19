@@ -31,7 +31,7 @@ import java.util.Map;
 
 public class SignupFragment extends Fragment {
 
-   private EditText editTextUsername, editTextEmail, editTextPassword, editTextPasswordConf, kidsNames;
+   private EditText editTextUsername, editTextEmail, editTextPassword, editTextPasswordConf, kidsEmails;
    private TextView header, studentAgeLabel, freeDaysLabel;
    private Spinner userTypeSpinner, studentAgeSpin;
    private Button signupBtn, cancelBtn;
@@ -55,7 +55,7 @@ public class SignupFragment extends Fragment {
       studentAgeLabel = view.findViewById(R.id.studentAgeLabel);
       freeDaysLabel = view.findViewById(R.id.freeDaysLabel);
       freeDaysLayout = view.findViewById(R.id.freeDaysLayout);
-      kidsNames = view.findViewById(R.id.kidsNameEditText);
+      kidsEmails = view.findViewById(R.id.kidsNameEditText);
 
       // Checkboxes
       monday = view.findViewById(R.id.mondayCheck);
@@ -95,9 +95,9 @@ public class SignupFragment extends Fragment {
                studentAgeLabel.setVisibility(View.VISIBLE);
                freeDaysLabel.setVisibility(View.VISIBLE);
                freeDaysLayout.setVisibility(View.VISIBLE);
-               kidsNames.setVisibility(View.GONE);
+               kidsEmails.setVisibility(View.GONE);
             } else if (selectedType.equalsIgnoreCase("Parent")) {
-               kidsNames.setVisibility(View.VISIBLE);
+               kidsEmails.setVisibility(View.VISIBLE);
                studentAgeSpin.setVisibility(View.GONE);
                studentAgeLabel.setVisibility(View.GONE);
                freeDaysLabel.setVisibility(View.GONE);
@@ -107,7 +107,7 @@ public class SignupFragment extends Fragment {
                studentAgeLabel.setVisibility(View.GONE);
                freeDaysLabel.setVisibility(View.GONE);
                freeDaysLayout.setVisibility(View.GONE);
-               kidsNames.setVisibility(View.GONE);
+               kidsEmails.setVisibility(View.GONE);
             }
          }
 
@@ -165,13 +165,17 @@ public class SignupFragment extends Fragment {
                     userData.put("user name", userName);
                     userData.put("userType", userType);
 
+                    //signing up as a student
                     if (userType.equalsIgnoreCase("Student")) {
                        userData.put("student age", studentAgeSpin.getSelectedItem().toString());
                        userData.put("freeDays", freeDays);
                        db.collection("users").document(uid).set(userData);
                        saveSessionAndNavigate(email, userName, userType);
-                    } else if (userType.equalsIgnoreCase("Parent")) {
-                       String childrenRaw = kidsNames.getText().toString().trim();
+                    }
+
+                    //sign up when you're a parent
+                    else if (userType.equalsIgnoreCase("Parent")) {
+                       String childrenRaw = kidsEmails.getText().toString().trim();
                        if (childrenRaw.isEmpty()) {
                           Toast.makeText(getContext(), "Please enter your children's emails", Toast.LENGTH_SHORT).show();
                           return;

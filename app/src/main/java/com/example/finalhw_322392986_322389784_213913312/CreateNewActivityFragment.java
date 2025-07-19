@@ -39,7 +39,7 @@ public class CreateNewActivityFragment extends Fragment {
             daysEditText, startDateEditText, endDateEditText;
     private CheckBox mondayCheckbox, tuesdayCheckbox, wednesdayCheckbox, thursdayCheckbox,
             fridayCheckbox, saturdayCheckbox, sundayCheckbox;
-    private Spinner domainCategorySpinner, subDomainSpinner;
+    private Spinner domainSpinner, subDomainSpinner;
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -79,21 +79,21 @@ public class CreateNewActivityFragment extends Fragment {
         startDateEditText.setOnClickListener(v -> showDatePicker(startDateEditText));
         endDateEditText.setOnClickListener(v -> showDatePicker(endDateEditText));
 
-        domainCategorySpinner = view.findViewById(R.id.domainCategorySpinner);
+        domainSpinner = view.findViewById(R.id.domainCategorySpinner);
         subDomainSpinner = view.findViewById(R.id.subDomainSpinner);
 
         view.findViewById(R.id.saveActivityBtn).setOnClickListener(v -> saveActivity());
 
         Map<String, List<String>> domainMap = new HashMap<>();
         domainMap.put("Science", Arrays.asList("biology", "robotics", "physics", "math"));
-        domainMap.put("social", Arrays.asList("leadership", "public speaking", "team working"));
-        domainMap.put("creativity", Arrays.asList("arts", "writing", "music"));
+        domainMap.put("Social", Arrays.asList("leadership", "public speaking", "team working"));
+        domainMap.put("Creativity", Arrays.asList("arts", "writing", "music"));
 
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, new ArrayList<>(domainMap.keySet()));
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        domainCategorySpinner.setAdapter(categoryAdapter);
+        domainSpinner.setAdapter(categoryAdapter);
 
-        domainCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        domainSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedCategory = parent.getItemAtPosition(position).toString();
@@ -127,7 +127,7 @@ public class CreateNewActivityFragment extends Fragment {
 
     private void saveActivity() {
         String title = titleEditText.getText().toString().trim();
-        String selectedDomain = domainCategorySpinner.getSelectedItem().toString();
+        String selectedDomain = domainSpinner.getSelectedItem().toString();
         String selectedSubdomain = subDomainSpinner.getSelectedItem().toString();
         String description = descriptionEditText.getText().toString().trim();
         String minAge = minAgeEditText.getText().toString().trim();
@@ -159,8 +159,8 @@ public class CreateNewActivityFragment extends Fragment {
 
         HashMap<String, Object> activity = new HashMap<>();
         activity.put("name", title);
-        activity.put("subDomain", selectedSubdomain);
-        activity.put("domain", selectedDomain);
+        activity.put("subDomain", selectedDomain );
+        activity.put("domain",selectedSubdomain);
         activity.put("description", description);
         activity.put("minAge", Integer.parseInt(minAge));
         activity.put("maxAge", Integer.parseInt(maxAge));

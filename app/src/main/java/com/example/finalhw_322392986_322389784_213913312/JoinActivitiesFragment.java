@@ -1,5 +1,7 @@
 package com.example.finalhw_322392986_322389784_213913312;
 
+import static android.view.View.GONE;
+
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,7 +29,7 @@ import java.util.Map;
 
 public class JoinActivitiesFragment extends Fragment {
     private RecyclerView recyclerView;
-    private Button filterBtn, resetBtn, saveBtn, cancelBtn;
+    private Button filterBtn, resetBtn, saveBtn, cancelBtn, createAct;
     private List<Activity> allActivities; //for dummy data
     private List<Activity> relevantActivities = new ArrayList<>(); // the relevant activities that will be displayed for each user
 
@@ -40,45 +45,23 @@ public class JoinActivitiesFragment extends Fragment {
         resetBtn = view.findViewById(R.id.resetBtn);
         cancelBtn = view.findViewById(R.id.cancelBtn);
         saveBtn = view.findViewById(R.id.saveBtn);
+        createAct = view.findViewById(R.id.createActivityBtn);
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Load dummy student and all activities (replace with Firebase logic later)
-        currentStudent = DummyDataProvider.getDummyStudent();
-        allActivities = DummyDataProvider.getDummyActivities();
+        selectedActivitiesPerDomain = new HashMap<>();
+        selectedJoinDates = new HashMap<>();
 
-        //  Filter relevant activities
-        relevantActivities = new ArrayList<>();
-        for (Activity activity : allActivities) {
-            if (isActivityRelevantToStudent(activity, currentStudent)) {
-                relevantActivities.add(activity);
-            }
-        }
+        // HIDE activity creation button for students
+        createAct.setVisibility(GONE);
 
-        // Initial adapter setup with join listener
-        ActivityAdapter adapter = new ActivityAdapter(relevantActivities, AdapterMode.JOIN);
-        adapter.setOnJoinClickListener(activity -> {
-            if (selectedActivitiesPerDomain.containsValue(activity)) {
-                Toast.makeText(requireContext(), "You already joined this activity", Toast.LENGTH_SHORT).show();
-            } else {
-                selectedActivitiesPerDomain.put(activity.getDomain(), activity);
-                Toast.makeText(requireContext(), "Joined " + activity.getName(), Toast.LENGTH_SHORT).show();
-                // this part saves the date of joining the activity
-                if (currentStudent.getJoinedActivityDates() == null) { // if the map is not initialized
-                    currentStudent.setJoinedActivityDates(new HashMap<>()); // initialize it
-                }
-                Date joinDate = new Date();
-                currentStudent.getJoinedActivityDates().put(activity.getActivityId(), joinDate);
-                // Store it in temporary map for saving later
-                selectedJoinDates.put(activity.getActivityId(), joinDate);
-            }
-        });
-        recyclerView.setAdapter(adapter);
+        // Load activities and student data
+        fetchActivitiesFromFirestore();
 
         // Filter button logic
         filterBtn.setOnClickListener(v -> {
             FilterJoinDialogFragment filterDialog = new FilterJoinDialogFragment();
-            filterDialog.setFilterListener((domain) -> filterActivities(domain));
+            filterDialog.setFilterListener(domain -> filterActivities(domain));
             filterDialog.show(getParentFragmentManager(), "FilterDialog");
         });
 
@@ -99,7 +82,6 @@ public class JoinActivitiesFragment extends Fragment {
                     .setNegativeButton("No", null)
                     .show();
         });
-
 
         saveBtn.setOnClickListener(v -> {
             if (selectedActivitiesPerDomain.containsKey("Science") &&
@@ -125,7 +107,6 @@ public class JoinActivitiesFragment extends Fragment {
                                 String activityId = activity.getActivityId();
                                 if (!registeredIds.contains(activityId)) {
                                     registeredIds.add(activityId);
-                                    // Save join date from temporary map
                                     joinedDates.put(activityId, selectedJoinDates.get(activityId));
                                 }
                             }
@@ -140,9 +121,77 @@ public class JoinActivitiesFragment extends Fragment {
             }
         });
 
-
         return view;
     }
+
+    private void fetchActivitiesFromFirestore() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Step 1: Fetch current student
+        db.collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    currentStudent = documentSnapshot.toObject(Student.class);
+
+                    if (currentStudent == null) {
+                        Toast.makeText(getContext(), "Failed to load student data", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Step 2: Fetch activities
+                    db.collection("activities")
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                allActivities = new ArrayList<>();
+                                relevantActivities = new ArrayList<>();
+
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    Activity activity = doc.toObject(Activity.class);
+                                    if (activity != null) {
+                                        activity.setActivityId(doc.getId());
+                                        allActivities.add(activity);
+
+                                        if (isActivityRelevantToStudent(activity, currentStudent)) {
+                                            relevantActivities.add(activity);
+                                        }
+                                    }
+                                }
+
+                                setupAdapterWithJoinListener();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Failed to fetch activities", Toast.LENGTH_SHORT).show());
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Failed to fetch user", Toast.LENGTH_SHORT).show());
+    }
+
+    private void setupAdapterWithJoinListener() {
+        ActivityAdapter adapter = new ActivityAdapter(relevantActivities, AdapterMode.JOIN);
+
+        adapter.setOnJoinClickListener(activity -> {
+            if (selectedActivitiesPerDomain.containsValue(activity)) {
+                Toast.makeText(requireContext(), "You already joined this activity", Toast.LENGTH_SHORT).show();
+            } else {
+                selectedActivitiesPerDomain.put(activity.getDomain(), activity);
+                Toast.makeText(requireContext(), "Joined " + activity.getName(), Toast.LENGTH_SHORT).show();
+
+                if (currentStudent.getJoinedActivityDates() == null) {
+                    currentStudent.setJoinedActivityDates(new HashMap<>());
+                }
+
+                Date joinDate = new Date();
+                currentStudent.getJoinedActivityDates().put(activity.getActivityId(), joinDate);
+                selectedJoinDates.put(activity.getActivityId(), joinDate);
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
+    }
+
+
 
     //  Domain filter on top of relevantActivities only
     private void filterActivities(String domain) {
@@ -182,36 +231,38 @@ public class JoinActivitiesFragment extends Fragment {
     private boolean isActivityRelevantToStudent(Activity activity, Student student) {
         try {
             Date endDate = activity.getEndDate();
-            Date today = new Date(); // Current date
-
-            // Check if the activity has already ended
-            if (endDate.before(today)) {
+            Date today = new Date();
+            if (endDate != null && endDate.before(today)) {
                 return false;
             }
 
-            String ageRange = activity.getAgeRange(); // e.g., "12–15"
-            String[] parts = ageRange.split("[-–]");
-            int minAge = Integer.parseInt(parts[0].trim());
-            int maxAge = Integer.parseInt(parts[1].trim());
-
+            int minAge = activity.getMinAge();
+            int maxAge = activity.getMaxAge();
             int studentAge = student.getAge();
             if (studentAge < minAge || studentAge > maxAge) {
                 return false;
             }
 
-
             String daysString = activity.getDays();
-            String[] activityDaysArray = daysString.split(",");
             List<String> activityDays = new ArrayList<>();
-            for (String day : activityDaysArray) {
-                activityDays.add(day.trim());
+            if (daysString != null && !daysString.isEmpty()) {
+                String[] activityDaysArray = daysString.split(",");
+                for (String day : activityDaysArray) {
+                    activityDays.add(day.trim());
+                }
             }
 
             List<String> studentFreeDays = student.getFreeDays();
-            for (String day : activityDays) {
-                if (!studentFreeDays.contains(day)) {
-                    return false;
+            if (studentFreeDays != null && !studentFreeDays.isEmpty() && !activityDays.isEmpty()) {
+                boolean hasMatchingDay = false;
+                for (String day : activityDays) {
+                    if (studentFreeDays.contains(day)) {
+                        hasMatchingDay = true;
+                        break;
+                    }
                 }
+                if (!hasMatchingDay) return false;
+
             }
 
             return true;
@@ -220,4 +271,5 @@ public class JoinActivitiesFragment extends Fragment {
             return false;
         }
     }
+
 }

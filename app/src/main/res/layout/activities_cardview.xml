@@ -160,6 +160,7 @@
             android:text="@string/join"
             card_view:layout_constraintBottom_toTopOf="@+id/deleteBtn"
             card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="1.0"
             card_view:layout_constraintStart_toEndOf="@+id/startDateTv"
             card_view:layout_constraintTop_toTopOf="parent" />
 
@@ -175,6 +176,7 @@
             android:text="@string/delete"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0.0"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toBottomOf="@+id/joinBtn" />
 

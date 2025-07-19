@@ -11,58 +11,6 @@ public class DummyDataProvider {
     public static List<Activity> getDummyActivities() {
         List<Activity> activities = new ArrayList<>();
 
-        Activity a1 = new Activity();
-        a1.setActivityId("A1");
-        a1.setName("Robotics Lab");
-        a1.setDomain("Social");
-        a1.setDescription("Build and program simple robots.");
-        a1.setMinAge(12);
-        a1.setMaxAge(15);
-        a1.setAgeRange("12–15");
-        a1.setDays("Monday, Wednesday");
-        a1.setMaxParticipants(15);
-        a1.setGuideId("guide123");
-        a1.setGuideFullName("Nolan Gomez");
-        a1.setRegisteredUserIds(Arrays.asList("student001", "student002"));
-        a1.setStartDate(getDaysAgo(10)); // Already started
-        a1.setEndDate(getDaysFromNow(20));
-
-        Activity a2 = new Activity();
-        a2.setActivityId("A2");
-        a2.setName("Space Exploration");
-        a2.setDomain("Science");
-        a2.setDescription("Learn about planets, stars, and rockets.");
-        a2.setMinAge(13);
-        a2.setMaxAge(16);
-        a2.setAgeRange("13–16");
-        a2.setDays("Tuesday");
-        a2.setMaxParticipants(20);
-        a2.setGuideId("guide456");
-        a2.setGuideFullName("Marry Smith");
-        a2.setRegisteredUserIds(new ArrayList<>());
-        a2.setStartDate(getDaysFromNow(5)); // Future activity
-        a2.setEndDate(getDaysFromNow(25));
-
-        Activity a3 = new Activity();
-        a3.setActivityId("A3");
-        a3.setName("Creative Music");
-        a3.setDomain("Creativity");
-        a3.setDescription("Learn about music.");
-        a3.setMinAge(13);
-        a3.setMaxAge(16);
-        a3.setAgeRange("13–16");
-        a3.setDays("Tuesday");
-        a3.setMaxParticipants(20);
-        a3.setGuideId("guide333");
-        a3.setGuideFullName("Marry Smith");
-        a3.setRegisteredUserIds(new ArrayList<>());
-        a3.setStartDate(getDaysAgo(3));
-        a3.setEndDate(getDaysFromNow(10));
-
-        activities.add(a1);
-        activities.add(a2);
-        activities.add(a3);
-
         return activities;
     }
 
