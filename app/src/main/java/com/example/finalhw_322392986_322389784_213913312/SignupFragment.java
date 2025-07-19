@@ -183,30 +183,34 @@ public class SignupFragment extends Fragment {
                        }
 
                        String[] childEmails = childrenRaw.split(",");
-                       List<String> childIds = new ArrayList<>();
+                       List<String> trimmedChildEmails = new ArrayList<>();
+                       for (String emailEntry : childEmails) {
+                          trimmedChildEmails.add(emailEntry.trim().toLowerCase());
+                       }
 
                        db.collection("users")
                                .whereEqualTo("userType", "Student")
                                .get()
                                .addOnSuccessListener(snapshot -> {
-                                  for (String rawEmail : childEmails) {
-                                     String emailToMatch = rawEmail.trim().toLowerCase();
-                                     for (var doc : snapshot.getDocuments()) {
-                                        String studentEmail = doc.getString("email");
-                                        if (studentEmail != null && studentEmail.toLowerCase().equals(emailToMatch)) {
-                                           childIds.add(doc.getId());
-                                        }
+                                  List<String> childIds = new ArrayList<>();
+
+                                  for (var doc : snapshot.getDocuments()) {
+                                     String studentEmail = doc.getString("email");
+                                     if (studentEmail != null && trimmedChildEmails.contains(studentEmail.toLowerCase())) {
+                                        childIds.add(doc.getId()); // UID of student
                                      }
                                   }
 
+                                  // Update parent data
                                   userData.put("childIds", childIds);
                                   db.collection("users").document(uid)
                                           .set(userData)
                                           .addOnSuccessListener(unused -> saveSessionAndNavigate(email, userName, userType))
                                           .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save parent data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                                })
-                               .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to fetch student list: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                    } else {
+                               .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to fetch students: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    }
+                    else {
                        db.collection("users").document(uid).set(userData);
                        saveSessionAndNavigate(email, userName, userType);
                     }
