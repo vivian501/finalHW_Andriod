@@ -1,6 +1,7 @@
 package com.example.finalhw_322392986_322389784_213913312;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,9 @@ import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Guide;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,30 +42,87 @@ public class GuidesActivitiesStudents extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewGuideActivities);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        currentGuide = DummyDataProvider.getDummyGuide(); // Replace with actual guide from login if needed
-        allActivities = DummyDataProvider.getDummyActivities(); // All activities
-        allStudents = DummyDataProvider.getDummyStudents();     // All students
+        //getting id of the guide using this page :
+        String guideId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        fetchActivitiesForGuide(guideId);
 
-        List<Activity> filtered = getActivitiesForCurrentGuide();
+        return view;
+    }
+    private void setupAdapter(List<Activity> activities) {
+        adapter = new ActivityAdapter(activities, AdapterMode.GUIDE);
 
-        adapter = new ActivityAdapter(filtered, AdapterMode.GUIDE);
-
-        // Handle clicks to open student rating fragment
         adapter.setOnRateClickListener(activity -> {
-            List<Student> joined = getStudentsRegisteredForActivity(activity.getActivityId());
+            fetchStudentsForActivity(activity.getActivityId(), joinedStudents -> {
+                RateStudentsFragment fragment = RateStudentsFragment.newInstance(activity.getActivityId(), joinedStudents);
 
-            RateStudentsFragment fragment = RateStudentsFragment.newInstance(activity.getActivityId(), joined);
-
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            });
         });
 
         recyclerView.setAdapter(adapter);
-        return view;
     }
+    private void fetchStudentsForActivity(String activityId, java.util.function.Consumer<List<Student>> callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        List<Student> result = new ArrayList<>();
+
+        db.collection("student_activity_joins")
+                .whereEqualTo("activityId", activityId)
+                .get()
+                .addOnSuccessListener(joinSnapshot -> {
+                    List<String> studentIds = new ArrayList<>();
+                    for (DocumentSnapshot joinDoc : joinSnapshot) {
+                        String sid = joinDoc.getString("studentId");
+                        if (sid != null) studentIds.add(sid);
+                    }
+
+                    if (studentIds.isEmpty()) {
+                        callback.accept(result);
+                        return;
+                    }
+
+                    db.collection("users")
+                            .whereIn("uid", studentIds)
+                            .get()
+                            .addOnSuccessListener(userSnapshot -> {
+                                for (DocumentSnapshot doc : userSnapshot) {
+                                    Student student = doc.toObject(Student.class);
+                                    if (student != null) {
+                                        result.add(student);
+                                    }
+                                }
+                                callback.accept(result);
+                            });
+                });
+    }
+
+
+    private void fetchActivitiesForGuide(String guideId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("activities")
+                .whereEqualTo("guideId", guideId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Activity> filtered = new ArrayList<>();
+                    Date now = new Date();
+
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Activity activity = doc.toObject(Activity.class);
+                        if (activity != null && activity.getStartDate() != null && !activity.getStartDate().after(now)) {
+                            activity.setActivityId(doc.getId()); // Save UID
+                            filtered.add(activity);
+                        }
+                    }
+
+                    setupAdapter(filtered);
+                })
+                .addOnFailureListener(e ->
+                        Log.e("GUIDE_FETCH", "Failed to fetch guide activities", e));
+    }
+
 
     /**
      * Filters and returns activities that are:
