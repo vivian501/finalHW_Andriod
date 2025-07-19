@@ -162,7 +162,7 @@ public class SignupFragment extends Fragment {
 
                     Map<String, Object> userData = new HashMap<>();
                     userData.put("email", email);
-                    userData.put("user name", userName);
+                    userData.put("fullName", userName);
                     userData.put("userType", userType);
 
                     //signing up as a student
@@ -220,7 +220,7 @@ public class SignupFragment extends Fragment {
       SharedPreferences prefs = requireActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
       SharedPreferences.Editor editor = prefs.edit();
       editor.putString("email", email);
-      editor.putString("user name", userName);
+      editor.putString("fullName", userName);
       editor.putString("userType", userType);
       editor.putBoolean("isLoggedIn", true);
       editor.apply();

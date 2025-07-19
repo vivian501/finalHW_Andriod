@@ -22,6 +22,8 @@ public class Activity {
    private Date EndDate; //when the activity ends
    private List<String> Photos;
 
+   private List<String> joinedStudentsIds;
+
 
     // constructor, empty
     public Activity() {
@@ -154,5 +156,17 @@ public class Activity {
 
     public void setDays(List<String> days) {
         this.days = days;
+    }
+
+    public List<String> getJoinedStudentsIds() {
+        return joinedStudentsIds;
+    }
+
+    public void setJoinedStudentsIds(List<String> joinedStudentsIds) {
+        this.joinedStudentsIds = joinedStudentsIds;
+    }
+
+    public void setSubDomain(String subDomain) {
+        this.subDomain = subDomain;
     }
 }

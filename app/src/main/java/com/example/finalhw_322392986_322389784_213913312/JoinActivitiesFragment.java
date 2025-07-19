@@ -93,6 +93,9 @@ public class JoinActivitiesFragment extends Fragment {
                         .setTitle("Save Registration")
                         .setMessage("Are you sure you are done?")
                         .setPositiveButton("Yes", (dialog, which) -> {
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
                             if (currentStudent.getRegisteredActivityIds() == null) {
                                 currentStudent.setRegisteredActivityIds(new ArrayList<>());
                             }
@@ -106,48 +109,54 @@ public class JoinActivitiesFragment extends Fragment {
 
                             for (Activity activity : selectedActivitiesPerDomain.values()) {
                                 String activityId = activity.getActivityId();
+                                Date joinDate = selectedJoinDates.get(activityId);
+
                                 if (!registeredIds.contains(activityId)) {
                                     registeredIds.add(activityId);
-                                    joinedDates.put(activityId, selectedJoinDates.get(activityId));
+                                    joinedDates.put(activityId, joinDate);
                                 }
+
+                                // Update activity: add student to joined list
+                                db.collection("activities")
+                                        .document(activityId)
+                                        .update("joinedStudentsIds", com.google.firebase.firestore.FieldValue.arrayUnion(studentId))
+                                        .addOnSuccessListener(unused ->
+                                                Log.d("FIRESTORE", "Added student to activity: " + activityId))
+                                        .addOnFailureListener(e ->
+                                                Log.e("FIRESTORE", "Failed to update activity " + activityId, e));
+
+                                // Optional: Also write a join record to student_activity_joins
+                                Map<String, Object> joinData = new HashMap<>();
+                                joinData.put("studentId", studentId);
+                                joinData.put("activityId", activityId);
+                                db.collection("student_activity_joins")
+                                        .document(studentId + "_" + activityId)
+                                        .set(joinData);
                             }
 
-                            requireActivity().getSupportFragmentManager().popBackStack();
-                            Toast.makeText(requireContext(), "Registration saved!", Toast.LENGTH_SHORT).show();
+                            // Update student document
+                            Map<String, Object> studentUpdates = new HashMap<>();
+                            studentUpdates.put("registeredActivityIds", registeredIds);
+                            studentUpdates.put("joinedActivityDates", joinedDates);
+
+                            db.collection("users")
+                                    .document(studentId)
+                                    .update(studentUpdates)
+                                    .addOnSuccessListener(unused -> {
+                                        Toast.makeText(requireContext(), "Registration saved!", Toast.LENGTH_SHORT).show();
+                                        requireActivity().getSupportFragmentManager().popBackStack();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(requireContext(), "Failed to save student: " + e.getMessage(), Toast.LENGTH_LONG).show());
+
                         })
                         .setNegativeButton("No", null)
                         .show();
-                //saving the uids of student and joined activites here
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                for (Activity activity : selectedActivitiesPerDomain.values()) {
-                    String activityId = activity.getActivityId();
-
-
-
-                    //for storing the two values
-                    Map<String, Object> joinData = new HashMap<>();
-                    joinData.put("studentId", studentId);
-                    joinData.put("activityId", activityId);
-
-
-                    //Using a unique doc ID: studentId_activityId
-                    String docId = studentId + "_" + activityId;
-
-                    db.collection("student_activity_joins")
-                            .document(docId)
-                            .set(joinData)
-                            .addOnSuccessListener(aVoid -> Log.d("FIRESTORE", "Join saved for: " + docId))
-                            .addOnFailureListener(e -> Log.e("FIRESTORE", "Failed to save join", e));
-
-
-
-                }
-
             } else {
                 Toast.makeText(requireContext(), "You must select one activity from each domain", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         return view;
     }

@@ -234,9 +234,21 @@ public class CreateNewActivityFragment extends Fragment {
         db.collection("activities")
                 .add(activity)
                 .addOnSuccessListener(docRef -> {
-                    Toast.makeText(getContext(), "Activity saved!", Toast.LENGTH_SHORT).show();
-                    requireActivity().getSupportFragmentManager().popBackStack();
+                    String activityId = docRef.getId();  // Get the auto-generated activity ID
+
+                    // Add the activity ID to the guide's assignedActivityIds list
+                    db.collection("users")
+                            .document(guideUid)
+                            .update("assignedActivityIds", com.google.firebase.firestore.FieldValue.arrayUnion(activityId))
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(getContext(), "Activity saved and assigned to guide!", Toast.LENGTH_SHORT).show();
+                                requireActivity().getSupportFragmentManager().popBackStack();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "Activity saved but failed to update guide: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            });
                 })
+
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }

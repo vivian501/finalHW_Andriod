@@ -69,35 +69,26 @@ public class GuidesActivitiesStudents extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         List<Student> result = new ArrayList<>();
 
-        db.collection("student_activity_joins")
-                .whereEqualTo("activityId", activityId)
+        // Get all students from "users" collection
+        db.collection("users")
+                .whereEqualTo("userType", "Student")
                 .get()
-                .addOnSuccessListener(joinSnapshot -> {
-                    List<String> studentIds = new ArrayList<>();
-                    for (DocumentSnapshot joinDoc : joinSnapshot) {
-                        String sid = joinDoc.getString("studentId");
-                        if (sid != null) studentIds.add(sid);
+                .addOnSuccessListener(snapshot -> {
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Student student = doc.toObject(Student.class);
+                        if (student != null &&
+                                student.getRegisteredActivityIds() != null &&
+                                student.getRegisteredActivityIds().contains(activityId)) {
+                            result.add(student);
+                        }
                     }
+                    callback.accept(result);
 
-                    if (studentIds.isEmpty()) {
-                        callback.accept(result);
-                        return;
-                    }
-
-                    db.collection("users")
-                            .whereIn("uid", studentIds)
-                            .get()
-                            .addOnSuccessListener(userSnapshot -> {
-                                for (DocumentSnapshot doc : userSnapshot) {
-                                    Student student = doc.toObject(Student.class);
-                                    if (student != null) {
-                                        result.add(student);
-                                    }
-                                }
-                                callback.accept(result);
-                            });
-                });
+                })
+                .addOnFailureListener(e ->
+                        Log.e("FETCH_STUDENTS", "Failed to load students", e));
     }
+
 
 
     private void fetchActivitiesForGuide(String guideId) {
