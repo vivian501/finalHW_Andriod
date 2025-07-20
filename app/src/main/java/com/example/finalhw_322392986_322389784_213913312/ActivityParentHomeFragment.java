@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment;
         browseBtn = view.findViewById(R.id.browseActBtn);
 
         ratingBtn.setOnClickListener(v -> {
-            // Navigate to the fragment that shows activities the guide can rate
+            // Navigate to the fragment that shows activities the parents can rate
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, new ParentsActivitiesStudents())
@@ -34,10 +34,10 @@ import androidx.fragment.app.Fragment;
         });
 
         pictureBtn.setOnClickListener(v -> {
-            // Navigate to the fragment that shows activities the guide can upload photos for
+            // Navigate to the fragment that shows activities the parents can see pictures for
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, new UploadPhotoMainFragment())
+                    .replace(R.id.fragment_container, new ParenImagesGallery())
                     .addToBackStack(null)
                     .commit();
         });
