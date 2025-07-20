@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Buttons for Create, Edit, Delete -->
+    <!-- Buttons for create/edit/delete for program coordinator -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,33 +15,81 @@
         android:layout_marginBottom="12dp">
 
         <Button
-            android:id="@+id/newActivityBtn"
+            android:id="@+id/createActivityBtn"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="New Activity" />
+            android:text="@string/new_activity" />
 
         <Button
             android:id="@+id/editActivityBtn"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Edit Activity"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginEnd="8dp"
+            android:text="@string/edit_activity" />
 
         <Button
             android:id="@+id/deleteActivityBtn"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Delete Activity" />
+            android:text="@string/delete_activity" />
     </LinearLayout>
 
-    <!-- RecyclerView to show activities -->
+    <!-- Buttons for student filtering/join logic -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="12dp">
+
+        <Button
+            android:id="@+id/filterBtn"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/filter" />
+
+        <Button
+            android:id="@+id/resetBtn"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/reset" />
+
+        <Button
+            android:id="@+id/cancelBtn"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/saveBtn"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/save" />
+    </LinearLayout>
+
+    <!-- RecyclerView for both views -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:contentDescription="@string/activity_list" />
 </LinearLayout>
