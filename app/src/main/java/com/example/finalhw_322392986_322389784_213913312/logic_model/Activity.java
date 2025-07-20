@@ -25,6 +25,8 @@ public class Activity {
 
    private List<String> joinedStudentsIds;
     private Map<String, String> comments;
+    private Map<String, Integer> ratings;
+
 
 
 
@@ -99,6 +101,23 @@ public class Activity {
     public void setActivityId(String activityId) {
 
         this.activityId = activityId;
+    }
+
+    public Map<String, String> getComments() {
+        return comments;
+    }
+
+    public void setComments(Map<String, String> comments) {
+        this.comments = comments;
+    }
+
+
+    public Map<String, Integer> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(Map<String, Integer> ratings) {
+        this.ratings = ratings;
     }
 
     public List<String> getRegisteredUserIds() {

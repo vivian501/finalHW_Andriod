@@ -100,7 +100,7 @@ public class ParentsRateStudentsFragment extends Fragment {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             String parentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-            // Step 1: Get the parent's document and fetch childIds
+            // Step 1: Get the parent's child IDs
             db.collection("users").document(parentUid).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (!documentSnapshot.exists()) {
@@ -114,42 +114,50 @@ public class ParentsRateStudentsFragment extends Fragment {
                             return;
                         }
 
-                        Log.d(TAG, "Child IDs found: " + childIds);
+                        Log.d(TAG, "Parent has " + childIds.size() + " children");
 
-                        // Step 2: Save ratings/comments for each relevant child
+                        // Prepare batch update to the activity document
+                        Map<String, Object> updates = new HashMap<>();
+
                         for (Student student : registeredStudents) {
-                            String uid = student.getUid();
+                            String childId = student.getUid();
 
-                            if (childIds.contains(uid) && ratingChanges.containsKey(uid)) {
-                                Pair<Integer, String> update = ratingChanges.get(uid);
+                            if (childIds.contains(childId) && ratingChanges.containsKey(childId)) {
+                                Pair<Integer, String> update = ratingChanges.get(childId);
 
-                                Map<String, Object> data = new HashMap<>();
-                                data.put("rating", update.first);
-                                data.put("comment", update.second);
+                                // Update maps inside the activity document:
+                                updates.put("comments." + childId, update.second);
+                                updates.put("ratings." + childId, update.first);
 
-                                db.collection("activities")
-                                        .document(activityId)
-                                        .collection("ratings")
-                                        .document(uid)
-                                        .set(data)
-                                        .addOnSuccessListener(unused -> {
-                                            Log.d(TAG, "Saved to activity/ratings for student: " + uid);
-                                            Toast.makeText(requireContext(), "Saved for " + student.getFullName(), Toast.LENGTH_SHORT).show();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e(TAG, "Error saving for student: " + uid, e);
-                                            Toast.makeText(requireContext(), "Failed to save " + student.getFullName(), Toast.LENGTH_LONG).show();
-                                        });
+                                Log.d(TAG, "Prepared update for child " + childId + ": rating=" + update.first + ", comment=" + update.second);
                             }
                         }
 
-                        ratingChanges.clear(); // Clear pending changes
+                        if (updates.isEmpty()) {
+                            Toast.makeText(requireContext(), "No ratings/comments to save", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Update the activity document with the maps
+                        db.collection("activities")
+                                .document(activityId)
+                                .update(updates)
+                                .addOnSuccessListener(unused -> {
+                                    Toast.makeText(requireContext(), "Saved ratings/comments to activity", Toast.LENGTH_SHORT).show();
+                                    Log.d(TAG, "Activity document updated successfully");
+                                    ratingChanges.clear();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Failed to update activity document", e);
+                                    Toast.makeText(requireContext(), "Failed to save to activity", Toast.LENGTH_SHORT).show();
+                                });
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to fetch parent data", e);
-                        Toast.makeText(requireContext(), "Failed to fetch parent info", Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "Failed to fetch parent user document", e);
+                        Toast.makeText(requireContext(), "Error loading parent data", Toast.LENGTH_SHORT).show();
                     });
         });
+
 
 
         return view;

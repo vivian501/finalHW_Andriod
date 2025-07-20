@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalhw_322392986_322389784_213913312.AdapterMode;
 import com.example.finalhw_322392986_322389784_213913312.R;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -23,6 +22,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
     public ActivityAdapter(List<Activity> activityList) {
         this.activityList = activityList;
     }
+
     public ActivityAdapter(List<Activity> activityList, AdapterMode mode){
         this.activityList = activityList;
         this.mode = mode;
@@ -89,14 +89,14 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         }
 
 
-    if (mode == AdapterMode.PARENT_COMMENT) {
-        holder.itemView.setOnClickListener(v -> {
-            if (parentClickListener != null) {
-                parentClickListener.onParentCommentClicked(activity);
-            }
-        });
+        if (mode == AdapterMode.PARENT_COMMENT) {
+            holder.itemView.setOnClickListener(v -> {
+                if (parentClickListener != null) {
+                    parentClickListener.onParentCommentClicked(activity);
+                }
+            });
+        }
     }
-}
 
     public void updateActivityList(List<Activity> newList) {
         this.activityList = newList;

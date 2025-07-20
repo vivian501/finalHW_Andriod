@@ -3,7 +3,6 @@
     <string name="welcome">welcome to SciCenter!</string>
     <string name="login">Login</string>
     <string name="signup">Signup</string>
-    <string name="cancel">Cancel</string>
     <string name="signup_form">Signup Form</string>
     <string name="password">Enter Your Password</string>
     <string name="password_conf">Confirm Password</string>
@@ -23,8 +22,6 @@
     <string name="progReport">Progress Report</string>
     <string name="browseAct">Browse Activities</string>
     <string name="joinAct">Join Activities</string>
-    <string name="filter">Filter</string>
-    <string name="reset">Reset</string>
     <string name="actName">Activity Name</string>
     <string name="domainAge">Domain · Age Range</string>
     <string name="days">Days: …</string>
@@ -50,7 +47,6 @@
     <string name="maxParticipantsFltr">Max Participants:</string>
     <string name="apply">Apply</string>
     <string name="join">Join</string>
-    <string name="save">Save</string>
     <string name="myActivities">My Monthly Activities</string>
     <string name="delete">Delete</string>
     <string name="title">My Monthly Activities</string>
@@ -107,5 +103,14 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="commentRepl"><![CDATA[View Comments & Reply]]></string>
     <string name="nocomments">No Comments Found</string>
+    <string name="new_activity">New Activity</string>
+    <string name="edit_activity">Edit Activity</string>
+    <string name="delete_activity">Delete Activity</string>
+    <string name="filter">Filter</string>
+    <string name="reset">Reset</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="activity_list">List of activities</string>
+
 
 </resources>
