@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
     <LinearLayout
+        android:id="@+id/activityFormContainer"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/titleEditText"
-            android:hint="@string/activityTitle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:inputType="textCapSentences"
-            android:autofillHints="name" />
+            android:layout_height="48dp"
+            android:hint="@string/activityTitle"
+            android:inputType="text"
+            android:autofillHints="name"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@android:color/white" />
 
         <!-- Domain -->
         <TextView
@@ -35,8 +38,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/selectSubDomain"
             android:layout_marginTop="8dp"
+            android:text="@string/selectSubDomain"
             android:textStyle="bold" />
 
         <Spinner
@@ -47,11 +50,12 @@
         <EditText
             android:id="@+id/descriptionEditText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
+            android:layout_height="48dp"
             android:hint="@string/description"
-            android:inputType="textCapSentences|textMultiLine"
-            android:autofillHints="description" />
+            android:inputType="text"
+            android:autofillHints="description"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@android:color/white" />
 
         <!-- Min Age -->
         <TextView
@@ -94,12 +98,13 @@
 
         <EditText
             android:id="@+id/maxParticipantsEditText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
             android:hint="@string/maxParticipants"
             android:inputType="number"
-            android:autofillHints="username"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp" />
+            android:autofillHints="phoneNumber"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@android:color/white" />
 
         <!-- Day Checkboxes -->
         <TextView
@@ -110,7 +115,6 @@
             android:textSize="16sp"
             android:layout_marginTop="8dp" />
 
-        <!-- Row 1 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -139,7 +143,6 @@
                 android:text="@string/wednesday" />
         </LinearLayout>
 
-        <!-- Row 2 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -167,7 +170,6 @@
                 android:text="@string/saturday" />
         </LinearLayout>
 
-        <!-- Row 3 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -194,25 +196,23 @@
         <!-- Start/End Dates -->
         <EditText
             android:id="@+id/startDateEditText"
-            android:hint="@string/startDate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:focusable="false"
-            android:clickable="true"
+            android:layout_height="48dp"
+            android:hint="@string/startDate"
             android:inputType="date"
-            android:autofillHints="username" />
+            android:autofillHints="dateOfBirth"
+            android:focusable="false"
+            android:clickable="true" />
 
         <EditText
             android:id="@+id/endDateEditText"
-            android:hint="@string/endDate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:focusable="false"
-            android:clickable="true"
+            android:layout_height="48dp"
+            android:hint="@string/endDate"
             android:inputType="date"
-            android:autofillHints="username" />
+            android:autofillHints="dateOfBirth"
+            android:focusable="false"
+            android:clickable="true" />
 
         <Button
             android:id="@+id/saveActivityBtn"
@@ -223,14 +223,5 @@
             android:text="@string/SaveActivity"
             android:textColor="@android:color/white" />
 
-        <Button
-            android:id="@+id/deleteActivityBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delete Activity"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@android:color/holo_red_dark"
-            android:textColor="@android:color/white"
-            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>
