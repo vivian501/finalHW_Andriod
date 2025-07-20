@@ -88,7 +88,15 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             holder.itemView.setOnClickListener(null);
         }
 
+
+    if (mode == AdapterMode.PARENT_COMMENT) {
+        holder.itemView.setOnClickListener(v -> {
+            if (parentClickListener != null) {
+                parentClickListener.onParentCommentClicked(activity);
+            }
+        });
     }
+}
 
     public void updateActivityList(List<Activity> newList) {
         this.activityList = newList;
@@ -134,6 +142,18 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
     public void setOnRateClickListener(OnGuideClickListener listener) {
         this.guideClickListener = listener;
     }
+
+    // for parent comment click
+    public interface OnParentCommentClickListener {
+        void onParentCommentClicked(Activity activity);
+    }
+
+    private OnParentCommentClickListener parentClickListener;
+
+    public void setOnParentCommentClickListener(OnParentCommentClickListener listener) {
+        this.parentClickListener = listener;
+    }
+
 
 
 

@@ -6,42 +6,52 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/browseActBtn"
-        android:layout_width="241dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:backgroundTint="@color/darkBlue"
-        android:text="@string/browseAct"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pictureBtn"
-        app:layout_constraintVertical_bias="0.199" />
-
-    <Button
         android:id="@+id/ratingBtn"
         android:layout_width="241dp"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/darkBlue"
         android:text="@string/rateOfParent"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/pictureBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.553" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="48dp"/>
 
     <Button
         android:id="@+id/pictureBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="364dp"
+        android:layout_width="286dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="24dp"
         android:backgroundTint="@color/darkBlue"
         android:text="@string/seePictures"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ratingBtn" />
+
+    <Button
+        android:id="@+id/browseActBtn"
+        android:layout_width="241dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/darkBlue"
+        android:text="@string/browseAct"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/pictureBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <Button
+        android:id="@+id/commentBtn"
+        android:layout_width="290dp"
+        android:layout_height="58dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/darkBlue"
+        android:text="@string/commentRepl"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/browseActBtn" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
