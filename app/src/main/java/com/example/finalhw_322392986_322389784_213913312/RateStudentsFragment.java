@@ -107,6 +107,7 @@ public class RateStudentsFragment extends Fragment {
 
             for (Student student : registeredStudents) {
                 String uid = student.getUid();
+                Log.d("DEBUG_STUDENT viviviviiiii", "Student: " + student.getUid() + ", name: " + student.getFullName());
                 if (ratingChanges.containsKey(uid)) {
                     Pair<Integer, String> update = ratingChanges.get(uid);
 
