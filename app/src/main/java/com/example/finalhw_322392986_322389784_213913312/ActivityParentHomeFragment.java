@@ -10,9 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-    public class ActivityParentHomeFragment extends Fragment {
+public class ActivityParentHomeFragment extends Fragment {
 
-    private Button ratingBtn, browseBtn, pictureBtn;
+    private Button ratingBtn, browseBtn, pictureBtn, commentBtn; // added comment button
 
     @Nullable
     @Override
@@ -23,9 +23,10 @@ import androidx.fragment.app.Fragment;
         ratingBtn = view.findViewById(R.id.ratingBtn);
         pictureBtn = view.findViewById(R.id.pictureBtn);
         browseBtn = view.findViewById(R.id.browseActBtn);
+        commentBtn = view.findViewById(R.id.commentBtn); // must exist in XML
 
         ratingBtn.setOnClickListener(v -> {
-            // Navigate to the fragment that shows activities the guide can rate
+            // Navigate to the fragment that shows activities the parents can rate
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, new ParentsActivitiesStudents())
@@ -34,10 +35,10 @@ import androidx.fragment.app.Fragment;
         });
 
         pictureBtn.setOnClickListener(v -> {
-            // Navigate to the fragment that shows activities the guide can upload photos for
+            // Navigate to the fragment that shows activities the parents can see pictures for
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, new UploadPhotoMainFragment())
+                    .replace(R.id.fragment_container, new ParenImagesGallery())
                     .addToBackStack(null)
                     .commit();
         });
@@ -49,6 +50,13 @@ import androidx.fragment.app.Fragment;
                     .commit();
         });
 
+        commentBtn.setOnClickListener(v -> {
+            // Navigate to the new fragment that displays guide comments + reply field
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new ParentCommentsFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         return view;
     }
