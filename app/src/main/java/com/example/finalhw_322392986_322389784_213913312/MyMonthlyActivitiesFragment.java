@@ -23,6 +23,7 @@ import com.google.firebase.firestore.*;
 import java.util.*;
 
 public class MyMonthlyActivitiesFragment extends Fragment {
+
     private RecyclerView recyclerView;
     private TextView title;
     private Student currentStudent;
@@ -98,16 +99,25 @@ public class MyMonthlyActivitiesFragment extends Fragment {
                             .setPositiveButton("Yes", (dialog, which) -> {
                                 currentStudent.getRegisteredActivityIds().remove(activityId);
                                 joinDates.remove(activityId);
-                                Toast.makeText(requireContext(), "Activity removed", Toast.LENGTH_SHORT).show();
 
-                                // Update Firebase with new data
+                                // Update Firebase with new data (removes the activity from the lists)
                                 FirebaseFirestore.getInstance().collection("users")
                                         .document(currentStudent.getUid())
-                                        .set(currentStudent)
+                                        .update(
+                                                "registeredActivityIds", currentStudent.getRegisteredActivityIds(),
+                                                "joinedActivityDates", currentStudent.getJoinedActivityDates()
+                                        )
                                         .addOnSuccessListener(unused -> {
+                                            Toast.makeText(requireContext(), "Activity removed", Toast.LENGTH_SHORT).show();
                                             List<Activity> updatedList = getActivitiesJoinedThisMonth(currentStudent, allActivities);
                                             adapter.updateActivityList(updatedList);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(requireContext(), "Failed to update student in Firestore", Toast.LENGTH_SHORT).show();
+                                            Log.e("FIRESTORE_UPDATE", "Error updating student document", e);
                                         });
+
+
                             })
                             .setNegativeButton("No", null)
                             .show();

@@ -112,7 +112,7 @@ public class CreateNewActivityFragment extends Fragment {
 
                     for (var doc : querySnapshot.getDocuments()) {
                         String name = doc.getString("user name");
-                        String uid = doc.getId(); // ✅ Firestore UID
+                        String uid = doc.getId(); //  Firestore UID
 
                         if (name != null && uid != null) {
                             guideNames.add(name);
