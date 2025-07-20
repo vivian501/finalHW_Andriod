@@ -89,14 +89,14 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         }
 
 
-    if (mode == AdapterMode.PARENT_COMMENT) {
-        holder.itemView.setOnClickListener(v -> {
-            if (parentClickListener != null) {
-                parentClickListener.onParentCommentClicked(activity);
-            }
-        });
+        if (mode == AdapterMode.PARENT_COMMENT) {
+            holder.itemView.setOnClickListener(v -> {
+                if (parentClickListener != null) {
+                    parentClickListener.onParentCommentClicked(activity);
+                }
+            });
+        }
     }
-}
 
     public void updateActivityList(List<Activity> newList) {
         this.activityList = newList;

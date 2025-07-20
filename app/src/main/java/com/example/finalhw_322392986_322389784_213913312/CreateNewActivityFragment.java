@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -39,7 +38,7 @@ public class CreateNewActivityFragment extends Fragment {
 
     private EditText titleEditText, descriptionEditText,
             maxParticipantsEditText,
-            daysEditText, startDateEditText, endDateEditText;
+            startDateEditText, endDateEditText;
     private CheckBox mondayCheckbox, tuesdayCheckbox, wednesdayCheckbox, thursdayCheckbox,
             fridayCheckbox, saturdayCheckbox, sundayCheckbox;
     private Spinner domainSpinner, subDomainSpinner, minAgeSpinner, maxAgeSpinner, guideSpinner;
@@ -52,7 +51,6 @@ public class CreateNewActivityFragment extends Fragment {
     private boolean isEditMode = false;
     private String activityIdToEdit = null;
     private Activity existingActivity = null;
-
 
     @Nullable
     @Override
@@ -75,7 +73,6 @@ public class CreateNewActivityFragment extends Fragment {
         guideSpinner = view.findViewById(R.id.guideSpinner);
         maxParticipantsEditText = view.findViewById(R.id.maxParticipantsEditText);
 
-
         mondayCheckbox = view.findViewById(R.id.mondayCheckbox);
         tuesdayCheckbox = view.findViewById(R.id.tuesdayCheckbox);
         wednesdayCheckbox = view.findViewById(R.id.wednesdayCheckbox);
@@ -95,54 +92,35 @@ public class CreateNewActivityFragment extends Fragment {
 
         view.findViewById(R.id.saveActivityBtn).setOnClickListener(v -> saveActivity());
 
-        Button deleteButton = view.findViewById(R.id.deleteActivityBtn);
-        if (isEditMode) {
-            deleteButton.setVisibility(View.VISIBLE);
-            deleteButton.setOnClickListener(v -> {
-                if (activityIdToEdit != null) {
-                    db.collection("activities").document(activityIdToEdit)
-                            .delete()
-                            .addOnSuccessListener(unused -> {
-                                Toast.makeText(getContext(), "Activity deleted", Toast.LENGTH_SHORT).show();
-                                requireActivity().getSupportFragmentManager().popBackStack();
-                            })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(getContext(), "Error deleting: " + e.getMessage(), Toast.LENGTH_LONG).show());
-                }
-            });
-        } else {
-            deleteButton.setVisibility(View.GONE);
-        }
-
-        //  Populate min age spinner (12-17)
+        // Populate min age spinner (12-17)
         List<Integer> minAges = new ArrayList<>();
         for (int i = 12; i <= 17; i++) minAges.add(i);
         ArrayAdapter<Integer> minAgeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, minAges);
         minAgeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         minAgeSpinner.setAdapter(minAgeAdapter);
 
-//  Populate max age spinner (13-18)
+        // Populate max age spinner (13-18)
         List<Integer> maxAges = new ArrayList<>();
         for (int i = 13; i <= 18; i++) maxAges.add(i);
         ArrayAdapter<Integer> maxAgeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, maxAges);
         maxAgeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         maxAgeSpinner.setAdapter(maxAgeAdapter);
 
-// Fetch guides from Firestore and populate spinner
+        // Fetch guides from Firestore and populate spinner
         db.collection("users")
                 .whereEqualTo("userType", "Activity guide")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<String> guideNames = new ArrayList<>();
-                    guideNameToUid.clear(); // clear any previous data
+                    guideNameToUid.clear();
 
                     for (var doc : querySnapshot.getDocuments()) {
                         String name = doc.getString("user name");
-                        String uid = doc.getId(); //  Firestore UID
+                        String uid = doc.getId();
 
                         if (name != null && uid != null) {
                             guideNames.add(name);
-                            guideNameToUid.put(name, uid); // Map name → UID
+                            guideNameToUid.put(name, uid);
                         }
                     }
 
@@ -155,7 +133,6 @@ public class CreateNewActivityFragment extends Fragment {
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "Failed to load guides: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
-
         if (getArguments() != null) {
             isEditMode = getArguments().getBoolean("isEditMode", false);
             activityIdToEdit = getArguments().getString("activityId", null);
@@ -167,7 +144,7 @@ public class CreateNewActivityFragment extends Fragment {
 
         if (isEditMode) {
             Button saveBtn = view.findViewById(R.id.saveActivityBtn);
-            saveBtn.setText("Update Activity"); // or use getString(R.string.updateActivity) if using strings.xml
+            saveBtn.setText("Update Activity");
         }
 
         Map<String, List<String>> domainMap = new HashMap<>();
@@ -192,11 +169,8 @@ public class CreateNewActivityFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
-
-
     }
 
-    //helper method for opening date picker
     private void showDatePicker(EditText targetEditText) {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePicker = new DatePickerDialog(getContext(),
@@ -210,10 +184,8 @@ public class CreateNewActivityFragment extends Fragment {
         datePicker.show();
     }
 
-
     private void loadActivityForEdit(String activityId) {
-        FirebaseFirestore.getInstance()
-                .collection("activities")
+        db.collection("activities")
                 .document(activityId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -224,9 +196,8 @@ public class CreateNewActivityFragment extends Fragment {
                         }
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to load activity.", Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Failed to load activity.", Toast.LENGTH_SHORT).show());
     }
 
     private void populateFields(Activity activity) {
@@ -234,18 +205,12 @@ public class CreateNewActivityFragment extends Fragment {
         descriptionEditText.setText(activity.getDescription());
         maxParticipantsEditText.setText(String.valueOf(activity.getMaxParticipants()));
 
-        // Select domain and subdomain
         setSpinnerSelection(domainSpinner, activity.getDomain());
         setSpinnerSelection(subDomainSpinner, activity.getSubDomain());
-
-        // Select min and max age
         setSpinnerSelection(minAgeSpinner, String.valueOf(activity.getMinAge()));
         setSpinnerSelection(maxAgeSpinner, String.valueOf(activity.getMaxAge()));
+        setSpinnerSelection(guideSpinner, activity.getGuideFullName());
 
-        // Select guide
-        setSpinnerSelection(guideSpinner, activity.getGuideFullName());  // ✅ correct
-
-        // Set days checkboxes
         List<String> selectedDays = activity.getDays();
         if (selectedDays != null) {
             mondayCheckbox.setChecked(selectedDays.contains("Monday"));
@@ -257,13 +222,10 @@ public class CreateNewActivityFragment extends Fragment {
             sundayCheckbox.setChecked(selectedDays.contains("Sunday"));
         }
 
-        // Set dates (assume they're strings already or convert them)
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         startDateEditText.setText(sdf.format(activity.getStartDate()));
         endDateEditText.setText(sdf.format(activity.getEndDate()));
-
     }
-
 
     private void setSpinnerSelection(Spinner spinner, String value) {
         SpinnerAdapter adapter = spinner.getAdapter();
@@ -300,7 +262,6 @@ public class CreateNewActivityFragment extends Fragment {
         String startDateStr = startDateEditText.getText().toString().trim();
         String endDateStr = endDateEditText.getText().toString().trim();
 
-        // Validate required fields
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(maxParticipants)
                 || TextUtils.isEmpty(startDateStr) || TextUtils.isEmpty(endDateStr)) {
             Toast.makeText(getContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show();
@@ -344,9 +305,7 @@ public class CreateNewActivityFragment extends Fragment {
             return;
         }
 
-
         if (isEditMode && activityIdToEdit != null) {
-            // UPDATE existing activity
             db.collection("activities")
                     .document(activityIdToEdit)
                     .update(activity)
@@ -357,7 +316,6 @@ public class CreateNewActivityFragment extends Fragment {
                     .addOnFailureListener(e ->
                             Toast.makeText(getContext(), "Error updating activity: " + e.getMessage(), Toast.LENGTH_LONG).show());
         } else {
-            // ADD new activity
             db.collection("activities")
                     .add(activity)
                     .addOnSuccessListener(docRef -> {
@@ -377,6 +335,4 @@ public class CreateNewActivityFragment extends Fragment {
                             Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
         }
     }
-
-
 }
