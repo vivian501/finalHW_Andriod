@@ -1,7 +1,6 @@
 package com.example.finalhw_322392986_322389784_213913312;
 
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
-
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -34,6 +32,8 @@ public class ParentsActivitiesStudents extends Fragment {
 
     private RecyclerView recyclerView;
     private ActivityAdapter adapter;
+    private final Map<String, List<Student>> activityToStudentsMap = new HashMap<>();
+    private int pendingChildrenToFetch = 0;
 
     @Nullable
     @Override
@@ -64,13 +64,9 @@ public class ParentsActivitiesStudents extends Fragment {
                         return;
                     }
 
-                    db.collection("activities")
-                            .get()
+                    db.collection("activities").get()
                             .addOnSuccessListener(querySnapshot -> {
                                 List<Activity> filtered = new ArrayList<>();
-                                Log.d("DEBUG", "Calling setupAdapter with " + filtered.size() + " activities");
-
-                                Map<String, List<Student>> activityToStudentsMap = new HashMap<>();
                                 Date now = new Date();
 
                                 for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
@@ -78,29 +74,38 @@ public class ParentsActivitiesStudents extends Fragment {
                                     if (activity == null || activity.getStartDate() == null) continue;
 
                                     if (!activity.getStartDate().after(now)) {
-                                        List<String> joinedStudentIds = activity.getJoinedStudentsIds()                ; // assumes studentIds field exists
-
+                                        List<String> joinedStudentIds = activity.getJoinedStudentsIds();
                                         if (joinedStudentIds != null) {
                                             Set<String> intersection = new HashSet<>(joinedStudentIds);
                                             intersection.retainAll(childIds);
-                                            Log.d("DEBUG", "Parent UID: " + parentUid);
-                                            Log.d("DEBUG", "Fetched child IDs: " + childIds);
-                                            Log.d("DEBUG", "Fetched " + querySnapshot.size() + " activities");
-                                            Log.d("DEBUG", "Calling setupAdapter with " + filtered.size() + " activities");
-
 
                                             if (!intersection.isEmpty()) {
                                                 activity.setActivityId(doc.getId());
                                                 filtered.add(activity);
 
+                                                // Prepare empty list, will fill when children are fetched
                                                 List<Student> matchedChildren = new ArrayList<>();
-                                                for (String childId : intersection) {
-                                                    Student child = new Student();
-                                                    child.setUid(childId);
-                                                    matchedChildren.add(child);
-                                                }
-
                                                 activityToStudentsMap.put(activity.getActivityId(), matchedChildren);
+
+                                                // Fetch full Student objects
+                                                for (String childId : intersection) {
+                                                    pendingChildrenToFetch++;
+                                                    db.collection("users").document(childId).get()
+                                                            .addOnSuccessListener(childDoc -> {
+                                                                Student child = childDoc.toObject(Student.class);
+                                                                if (child != null) {
+                                                                    child.setUid(childDoc.getId()); // ensure uid is set
+                                                                    matchedChildren.add(child);
+                                                                }
+                                                            })
+                                                            .addOnCompleteListener(task -> {
+                                                                pendingChildrenToFetch--;
+                                                                if (pendingChildrenToFetch == 0) {
+                                                                    Log.d("DEBUG", "All child fetches complete");
+                                                                    setupAdapter(filtered, activityToStudentsMap);
+                                                                }
+                                                            });
+                                                }
                                             }
                                         }
                                     }
@@ -108,14 +113,13 @@ public class ParentsActivitiesStudents extends Fragment {
 
                                 if (filtered.isEmpty()) {
                                     Toast.makeText(getContext(), "No activities found for your children.", Toast.LENGTH_SHORT).show();
-                                } else {
+                                } else if (pendingChildrenToFetch == 0) {
+                                    // No child fetch needed (shouldn’t happen unless names already available)
                                     setupAdapter(filtered, activityToStudentsMap);
                                 }
                             });
                 })
-
                 .addOnFailureListener(e -> Log.e("PARENT_FETCH", "Failed to fetch parent data", e));
-
     }
 
     private void setupAdapter(List<Activity> activities, Map<String, List<Student>> activityToStudentsMap) {
