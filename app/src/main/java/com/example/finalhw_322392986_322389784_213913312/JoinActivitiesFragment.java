@@ -7,7 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
 import android.widget.Button;
-import android.widget.Toast;
+import com.google.android.material.snackbar.Snackbar;
+
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -134,16 +135,16 @@ public class JoinActivitiesFragment extends Fragment {
                                     .document(studentId)
                                     .update(studentUpdates)
                                     .addOnSuccessListener(unused -> {
-                                        Toast.makeText(requireContext(), "Registration saved!", Toast.LENGTH_SHORT).show();
+                                        showSnackbar("Registration saved!");
                                         requireActivity().getSupportFragmentManager().popBackStack();
                                     })
-                                    .addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to save student: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                                    .addOnFailureListener(e -> showSnackbar("Failed to save student: " + e.getMessage()));
 
                         })
                         .setNegativeButton("No", null)
                         .show();
             } else {
-                Toast.makeText(requireContext(), "You must select one activity from each domain", Toast.LENGTH_SHORT).show();
+                showSnackbar("You must select one activity from each domain");
             }
         });
 
@@ -160,7 +161,7 @@ public class JoinActivitiesFragment extends Fragment {
                 .addOnSuccessListener(documentSnapshot -> {
                     currentStudent = documentSnapshot.toObject(Student.class);
                     if (currentStudent == null) {
-                        Toast.makeText(getContext(), "Failed to load student data", Toast.LENGTH_SHORT).show();
+                        showSnackbar("Failed to load student data");
                         return;
                     }
 
@@ -201,12 +202,12 @@ public class JoinActivitiesFragment extends Fragment {
             if (selectedActivities.contains(activity) ||
                     (currentStudent.getRegisteredActivityIds() != null &&
                             currentStudent.getRegisteredActivityIds().contains(activity.getActivityId()))) {
-                Toast.makeText(requireContext(), "You already joined this activity", Toast.LENGTH_SHORT).show();
+                showSnackbar("You already joined this activity");
             } else {
                 selectedActivities.add(activity);
                 selectedDomains.add(activity.getDomain());
 
-                Toast.makeText(requireContext(), "Joined " + activity.getName(), Toast.LENGTH_SHORT).show();
+                showSnackbar("Joined " + activity.getName());
                 Log.d(TAG, "Joined activity: " + activity.getName());
 
                 if (currentStudent.getJoinedActivityDates() == null) {
@@ -238,12 +239,12 @@ public class JoinActivitiesFragment extends Fragment {
             if (selectedActivities.contains(activity) ||
                     (currentStudent.getRegisteredActivityIds() != null &&
                             currentStudent.getRegisteredActivityIds().contains(activity.getActivityId()))) {
-                Toast.makeText(requireContext(), "You already joined this activity", Toast.LENGTH_SHORT).show();
+                showSnackbar("You already joined this activity");
             } else {
                 selectedActivities.add(activity);
                 selectedDomains.add(activity.getDomain());
 
-                Toast.makeText(requireContext(), "Joined " + activity.getName(), Toast.LENGTH_SHORT).show();
+                showSnackbar("Joined " + activity.getName());
                 Log.d(TAG, "Joined (filtered): " + activity.getName());
 
                 if (currentStudent.getJoinedActivityDates() == null) {
@@ -298,5 +299,11 @@ public class JoinActivitiesFragment extends Fragment {
             return false;
         }
     }
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
 
 }

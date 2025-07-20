@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
@@ -108,12 +108,12 @@ public class MyMonthlyActivitiesFragment extends Fragment {
                                                 "joinedActivityDates", currentStudent.getJoinedActivityDates()
                                         )
                                         .addOnSuccessListener(unused -> {
-                                            Toast.makeText(requireContext(), "Activity removed", Toast.LENGTH_SHORT).show();
+                                            showSnackbar("Activity removed");
                                             List<Activity> updatedList = getActivitiesJoinedThisMonth(currentStudent, allActivities);
                                             adapter.updateActivityList(updatedList);
                                         })
                                         .addOnFailureListener(e -> {
-                                            Toast.makeText(requireContext(), "Failed to update student in Firestore", Toast.LENGTH_SHORT).show();
+                                            showSnackbar("Failed to update student in Firestore");
                                             Log.e("FIRESTORE_UPDATE", "Error updating student document", e);
                                         });
 
@@ -122,7 +122,7 @@ public class MyMonthlyActivitiesFragment extends Fragment {
                             .setNegativeButton("No", null)
                             .show();
                 } else {
-                    Toast.makeText(requireContext(), "You can only remove activities within 7 days of joining", Toast.LENGTH_LONG).show();
+                    showSnackbar("You can only remove activities within 7 days of joining");
                 }
             }
         });
@@ -173,4 +173,10 @@ public class MyMonthlyActivitiesFragment extends Fragment {
 
         return daysSinceJoin <= 7;
     }
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
 }

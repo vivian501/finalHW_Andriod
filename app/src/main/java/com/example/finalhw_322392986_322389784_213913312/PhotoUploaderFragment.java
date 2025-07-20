@@ -11,7 +11,6 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.*;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -88,7 +88,7 @@ public class PhotoUploaderFragment extends Fragment {
                     if (isGranted) {
                         openCamera();
                     } else {
-                        Toast.makeText(getContext(), "Camera permission denied", Toast.LENGTH_SHORT).show();
+                        showSnackbar("Camera permission denied");
                     }
                 });
 
@@ -182,7 +182,13 @@ public class PhotoUploaderFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to load photos", Toast.LENGTH_SHORT).show();
+                    showSnackbar("Failed to load photos");
                 });
     }
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
 }

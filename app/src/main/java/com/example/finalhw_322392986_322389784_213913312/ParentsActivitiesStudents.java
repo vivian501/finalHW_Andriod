@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,7 +60,7 @@ public class ParentsActivitiesStudents extends Fragment {
                     List<String> childIds = (List<String>) parentDoc.get("childIds");
 
                     if (childIds == null || childIds.isEmpty()) {
-                        Toast.makeText(getContext(), "No children registered.", Toast.LENGTH_SHORT).show();
+                        showSnackbar("No children registered.");
                         return;
                     }
 
@@ -112,7 +112,7 @@ public class ParentsActivitiesStudents extends Fragment {
                                 }
 
                                 if (filtered.isEmpty()) {
-                                    Toast.makeText(getContext(), "No activities found for your children.", Toast.LENGTH_SHORT).show();
+                                    showSnackbar("No activities found for your children.");
                                 } else if (pendingChildrenToFetch == 0) {
                                     // No child fetch needed (shouldn’t happen unless names already available)
                                     setupAdapter(filtered, activityToStudentsMap);
@@ -138,4 +138,11 @@ public class ParentsActivitiesStudents extends Fragment {
 
         recyclerView.setAdapter(adapter);
     }
+
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
 }

@@ -12,12 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -55,7 +55,7 @@ public class LoginFragment extends Fragment {
         String password = editTextPassword.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(getContext(), "All fields must be filled", Toast.LENGTH_SHORT).show();
+            showSnackbar("All fields must be filled");
             return;
         }
 
@@ -78,20 +78,26 @@ public class LoginFragment extends Fragment {
                                 editor.putBoolean("isLoggedIn", true);
                                 editor.apply();
 
-                                Toast.makeText(getContext(), "Login successful!", Toast.LENGTH_SHORT).show();
+                                showSnackbar("Login successful!");
                                 startActivity(new Intent(getContext(), MainActivity.class));
                                 requireActivity().finish();
                             } else {
-                                Toast.makeText(getContext(), "User data not found in Firestore", Toast.LENGTH_LONG).show();
+                                showSnackbar("User data not found in Firestore");
                             }
                         })
                         .addOnFailureListener(e -> {
                             Log.e("FIREBASE", "Login failed", e);
-                            Toast.makeText(getContext(), "Failed to load user data: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            showSnackbar("Failed to load user data: " + e.getMessage());
                         });
             } else {
-                Toast.makeText(getContext(), "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                showSnackbar("Login failed: " + task.getException().getMessage());
             }
         });
     }
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
 }

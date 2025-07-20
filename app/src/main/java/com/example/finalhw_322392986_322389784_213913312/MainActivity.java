@@ -5,12 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -62,16 +62,17 @@ public class MainActivity extends AppCompatActivity {
                                 loadHomeFragment(userTypeFromFirestore); // reload if needed
                             }
                         } else {
-                            Toast.makeText(this, "User type not found in Firestore.", Toast.LENGTH_SHORT).show();
+                            showSnackbar("User type not found in Firestore.");
                             logout();
                         }
                     } else {
-                        Toast.makeText(this, "User document not found.", Toast.LENGTH_SHORT).show();
+                        showSnackbar("User document not found.");
                         logout();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to fetch user type from Firestore.", Toast.LENGTH_SHORT).show();
+                    showSnackbar("Failed to fetch user type from Firestore.");
+
                     logout();
                 });
 
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new CoordinatorHomeFragment();
                 break;
             default:
-                Toast.makeText(this, "Unknown role: " + userType, Toast.LENGTH_SHORT).show();
+                showSnackbar("Unknown role: " + userType);
                 logout();
                 return;
         }
@@ -115,4 +116,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, AuthActivity.class));
         finish();
     }
+    private void showSnackbar(String message) {
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+    }
+
 }

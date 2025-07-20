@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -67,7 +68,7 @@ public class BrowseActivitiesFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Failed to fetch user role", Toast.LENGTH_SHORT).show()
+                        Snackbar.make(requireView(), "Failed to fetch user role", Snackbar.LENGTH_LONG).show()
                 );
 
 
@@ -106,7 +107,7 @@ public class BrowseActivitiesFragment extends Fragment {
                     recyclerView.setAdapter(new ActivityAdapter(allActivities, AdapterMode.BROWSE));
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to fetch activities", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(requireView(), "Failed to fetch activities", Snackbar.LENGTH_LONG).show();
                 });
     }
 

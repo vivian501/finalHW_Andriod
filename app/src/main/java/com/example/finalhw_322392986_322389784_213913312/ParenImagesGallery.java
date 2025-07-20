@@ -3,7 +3,6 @@ package com.example.finalhw_322392986_322389784_213913312;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
@@ -43,7 +43,7 @@ public class ParenImagesGallery extends Fragment {
             List<String> childIds = (List<String>) parentDoc.get("childIds");
 
             if (childIds == null || childIds.isEmpty()) {
-                Toast.makeText(getContext(), "No registered children found.", Toast.LENGTH_SHORT).show();
+                showSnackbar("No registered children found.");
                 return;
             }
 
@@ -75,7 +75,7 @@ public class ParenImagesGallery extends Fragment {
             }
 
             if (photoList.isEmpty()) {
-                Toast.makeText(getContext(), "No activity photos found for your children.", Toast.LENGTH_SHORT).show();
+                showSnackbar("No activity photos found for your children.");
             }
 
             setupPhotoAdapter(photoList);
@@ -87,4 +87,11 @@ public class ParenImagesGallery extends Fragment {
         PhotoAdapter adapter = new PhotoAdapter(photos);
         recyclerView.setAdapter(adapter);
     }
+
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
 }

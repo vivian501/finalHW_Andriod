@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.*;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,7 @@ import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
 import com.example.finalhw_322392986_322389784_213913312.AdapterMode;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
@@ -62,7 +62,7 @@ public class ParentCommentsFragment extends Fragment {
                         studentId = childIds.get(0); // we assume one child for now
                         fetchStudentData();
                     } else {
-                        Toast.makeText(getContext(), "No child linked to this parent", Toast.LENGTH_SHORT).show();
+                        showSnackbar("No child linked to this parent");
                     }
                 })
                 .addOnFailureListener(e -> Log.e("PARENT_COMMENTS", "Failed to fetch parent data", e));
@@ -89,7 +89,7 @@ public class ParentCommentsFragment extends Fragment {
 
                         fetchJoinedActivities();
                     } else {
-                        Toast.makeText(getContext(), "Student not found", Toast.LENGTH_SHORT).show();
+                        showSnackbar("Student not found");
                     }
                 })
                 .addOnFailureListener(e -> Log.e("PARENT_COMMENTS", "Failed to fetch student", e));
@@ -148,7 +148,7 @@ public class ParentCommentsFragment extends Fragment {
             String reply = input.getText().toString().trim();
 
             if (reply.isEmpty()) {
-                Toast.makeText(getContext(), "Reply cannot be empty", Toast.LENGTH_SHORT).show();
+                showSnackbar("Reply cannot be empty");
                 return;
             }
 
@@ -157,10 +157,10 @@ public class ParentCommentsFragment extends Fragment {
             db.collection("users")
                     .document(student.getUid())
                     .update("parentReplies", parentReplies)
-                    .addOnSuccessListener(unused -> Toast.makeText(getContext(), "Reply saved", Toast.LENGTH_SHORT).show())
+                    .addOnSuccessListener(unused -> showSnackbar("Reply saved"))
                     .addOnFailureListener(e -> {
                         Log.e("PARENT_COMMENTS", "Failed to update parent reply", e);
-                        Toast.makeText(getContext(), "Failed to save reply", Toast.LENGTH_SHORT).show();
+                        showSnackbar("Failed to save reply");
                     });
         });
 
@@ -168,4 +168,10 @@ public class ParentCommentsFragment extends Fragment {
 
         builder.show();
     }
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
 }
