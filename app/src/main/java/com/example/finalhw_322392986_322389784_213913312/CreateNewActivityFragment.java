@@ -14,13 +14,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -103,11 +103,11 @@ public class CreateNewActivityFragment extends Fragment {
                     db.collection("activities").document(activityIdToEdit)
                             .delete()
                             .addOnSuccessListener(unused -> {
-                                showSnackbar(getView(), "Activity deleted");
+                                Toast.makeText(getContext(), "Activity deleted", Toast.LENGTH_SHORT).show();
                                 requireActivity().getSupportFragmentManager().popBackStack();
                             })
                             .addOnFailureListener(e ->
-                                    showSnackbar(getView(), "Error deleting: " + e.getMessage()));
+                                    Toast.makeText(getContext(), "Error deleting: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 }
             });
         } else {
@@ -153,8 +153,7 @@ public class CreateNewActivityFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e ->
-                        showSnackbar(getView(), "Failed to load guides: " + e.getMessage()));
-
+                        Toast.makeText(getContext(), "Failed to load guides: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
 
         if (getArguments() != null) {
@@ -226,7 +225,7 @@ public class CreateNewActivityFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    showSnackbar(getView(), "Failed to load activity.");
+                    Toast.makeText(getContext(), "Failed to load activity.", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -304,14 +303,14 @@ public class CreateNewActivityFragment extends Fragment {
         // Validate required fields
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(maxParticipants)
                 || TextUtils.isEmpty(startDateStr) || TextUtils.isEmpty(endDateStr)) {
-            showSnackbar(getView(), "Please fill all required fields");
+            Toast.makeText(getContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (domainSpinner.getSelectedItem() == null ||
                 subDomainSpinner.getSelectedItem() == null ||
                 guideSpinner.getSelectedItem() == null) {
-            showSnackbar(getView(), "Please fill all required fields");
+            Toast.makeText(getContext(), "Please select a domain, subdomain and guide", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -334,14 +333,14 @@ public class CreateNewActivityFragment extends Fragment {
             Date end = sdf.parse(endDateStr);
 
             if (end.before(start)) {
-                showSnackbar(getView(), "End date must be after start date");
+                Toast.makeText(getContext(), "End date must be after start date", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             activity.put("startDate", new Timestamp(start));
             activity.put("endDate", new Timestamp(end));
         } catch (ParseException e) {
-            showSnackbar(getView(), "Invalid date format");
+            Toast.makeText(getContext(), "Invalid date format", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -352,11 +351,11 @@ public class CreateNewActivityFragment extends Fragment {
                     .document(activityIdToEdit)
                     .update(activity)
                     .addOnSuccessListener(unused -> {
-                        showSnackbar(getView(), "Activity updated successfully");
+                        Toast.makeText(getContext(), "Activity updated successfully", Toast.LENGTH_SHORT).show();
                         requireActivity().getSupportFragmentManager().popBackStack();
                     })
                     .addOnFailureListener(e ->
-                            showSnackbar(getView(), "Error updating activity: " + e.getMessage()));
+                            Toast.makeText(getContext(), "Error updating activity: " + e.getMessage(), Toast.LENGTH_LONG).show());
         } else {
             // ADD new activity
             db.collection("activities")
@@ -367,20 +366,17 @@ public class CreateNewActivityFragment extends Fragment {
                                 .document(guideUid)
                                 .update("assignedActivityIds", com.google.firebase.firestore.FieldValue.arrayUnion(activityId))
                                 .addOnSuccessListener(unused -> {
-                                    showSnackbar(getView(), "Activity saved and assigned to guide!");
+                                    Toast.makeText(getContext(), "Activity saved and assigned to guide!", Toast.LENGTH_SHORT).show();
                                     requireActivity().getSupportFragmentManager().popBackStack();
                                 })
                                 .addOnFailureListener(e -> {
-                                    showSnackbar(getView(), "Activity saved but failed to update guide: " + e.getMessage());
+                                    Toast.makeText(getContext(), "Activity saved but failed to update guide: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                 });
                     })
                     .addOnFailureListener(e ->
-                            showSnackbar(getView(), "Error: " + e.getMessage()));
+                            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
         }
     }
 
-    private void showSnackbar(View view, String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
-    }
 
 }
