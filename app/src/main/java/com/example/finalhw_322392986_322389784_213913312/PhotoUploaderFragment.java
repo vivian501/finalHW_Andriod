@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +19,10 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -88,6 +93,9 @@ public class PhotoUploaderFragment extends Fragment {
                 });
 
         addPhotoBtn.setOnClickListener(v -> showPhotoOptionsDialog());
+
+        // === Fetch photos from Firestore ===
+        fetchPhotosFromFirestore();
     }
 
     private void showPhotoOptionsDialog() {
@@ -140,16 +148,41 @@ public class PhotoUploaderFragment extends Fragment {
     private void addPhotoToList(String base64Image) {
         photoBase64List.add(base64Image);
         adapter.notifyItemInserted(photoBase64List.size() - 1);
-        //  TODO: Save to Firebase/SQLite here using activityId as key
+        // Save updated photo list to Firestore
+        FirebaseFirestore.getInstance()
+                .collection("activities")
+                .document(activityId)
+                .update("photos", photoBase64List);
     }
 
-    //method to encode photos to base64
+    // method to encode photos to base64
     private String encodeToBase64(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         // compress the bitmap
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] imageBytes = stream.toByteArray();
-        //this is the encoded string and and it is returned(this is what is sent to the addPhotosToList method)
+        // this is the encoded string and and it is returned (this is what is sent to the addPhotosToList method)
         return Base64.encodeToString(imageBytes, Base64.DEFAULT);
+    }
+
+    // Load existing photos from Firestore and update recycler
+    private void fetchPhotosFromFirestore() {
+        FirebaseFirestore.getInstance()
+                .collection("activities")
+                .document(activityId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        List<String> photos = (List<String>) doc.get("photos");
+                        if (photos != null) {
+                            photoBase64List.clear();
+                            photoBase64List.addAll(photos);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to load photos", Toast.LENGTH_SHORT).show();
+                });
     }
 }

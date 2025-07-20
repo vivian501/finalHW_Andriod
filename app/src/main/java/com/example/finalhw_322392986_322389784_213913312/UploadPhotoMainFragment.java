@@ -1,10 +1,8 @@
 package com.example.finalhw_322392986_322389784_213913312;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
+import android.util.Log;
+import android.view.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -13,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
-import com.example.finalhw_322392986_322389784_213913312.logic_model.Guide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,9 +24,6 @@ public class UploadPhotoMainFragment extends Fragment {
     private RecyclerView recyclerView;
     private ActivityAdapter adapter;
 
-    private List<Activity> allActivities;
-    private Guide currentGuide;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -36,15 +33,18 @@ public class UploadPhotoMainFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewGuideActivities);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Replace with actual logged-in guide when sync is done
-        currentGuide = DummyDataProvider.getDummyGuide();
-        allActivities = DummyDataProvider.getDummyActivities();
+        // getting the id of the guide (logged-in user)
+        String guideId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        fetchActivitiesForGuide(guideId);
 
-        List<Activity> filtered = getActivitiesForCurrentGuide();
+        return view;
+    }
 
-        adapter = new ActivityAdapter(filtered, AdapterMode.GUIDE);
+    // setup the adapter with activities filtered by guide and date
+    private void setupAdapter(List<Activity> activities) {
+        adapter = new ActivityAdapter(activities, AdapterMode.GUIDE);
 
-
+        // on click go to photo upload fragment with the selected activity ID
         adapter.setOnRateClickListener(activity -> {
             Fragment fragment = PhotoUploaderFragment.newInstance(activity.getActivityId());
 
@@ -56,27 +56,31 @@ public class UploadPhotoMainFragment extends Fragment {
         });
 
         recyclerView.setAdapter(adapter);
-
-        return view;
     }
 
-    /**
-     * Filters and returns activities that are:
-     * - Assigned to the currently logged-in guide
-     * - Have already started
-     */
-    private List<Activity> getActivitiesForCurrentGuide() {
-        List<Activity> result = new ArrayList<>();
-        Date now = new Date();
+    // fetch only activities that belong to the logged-in guide and already started
+    private void fetchActivitiesForGuide(String guideId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("activities")
+                .whereEqualTo("guideId", guideId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Activity> filtered = new ArrayList<>();
+                    Date now = new Date();
 
-        for (Activity activity : allActivities) {
-            if (activity.getGuideId().equals(currentGuide.getUid()) &&
-                    activity.getStartDate() != null &&
-                    !activity.getStartDate().after(now)) {
-                result.add(activity);
-            }
-        }
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Activity activity = doc.toObject(Activity.class);
+                        if (activity != null && activity.getStartDate() != null && !activity.getStartDate().after(now)) {
+                            activity.setActivityId(doc.getId()); // Set ID from document
+                            filtered.add(activity);
+                        }
+                    }
 
-        return result;
+                    setupAdapter(filtered);
+                })
+                .addOnFailureListener(e ->
+                        Log.e("PHOTO_FETCH", "Failed to fetch guide activities", e));
     }
+
+
 }
