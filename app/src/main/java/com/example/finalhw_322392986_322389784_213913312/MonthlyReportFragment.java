@@ -14,12 +14,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.*;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MonthlyReportFragment extends Fragment {
 
@@ -27,7 +25,7 @@ public class MonthlyReportFragment extends Fragment {
     private ProgressBar scienceProgress, socialProgress, creativityProgress, ratingProgress;
 
     private Student currentStudent;
-    private List<Activity> allActivities;
+    private List<Activity> allActivities = new ArrayList<>();
 
     private TextView scienceLabel, socialLabel, creativityLabel;
 
@@ -51,12 +49,36 @@ public class MonthlyReportFragment extends Fragment {
 
         activityCountLabel.setText("Number Of Activities Joined This Month");
 
-        currentStudent = DummyDataProvider.getDummyStudent();
-        allActivities = DummyDataProvider.getDummyActivities();
-
-        updateMonthlyReport();
+        loadStudentAndActivities();
 
         return view;
+    }
+
+    private void loadStudentAndActivities() {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    currentStudent = doc.toObject(Student.class);
+                    if (currentStudent != null) {
+                        currentStudent.setUid(uid);
+
+                        db.collection("activities")
+                                .get()
+                                .addOnSuccessListener(snapshot -> {
+                                    for (DocumentSnapshot actDoc : snapshot.getDocuments()) {
+                                        Activity activity = actDoc.toObject(Activity.class);
+                                        if (activity != null) {
+                                            activity.setActivityId(actDoc.getId());
+                                            allActivities.add(activity);
+                                        }
+                                    }
+                                    updateMonthlyReport();
+                                });
+                    }
+                });
     }
 
     private void updateMonthlyReport() {
@@ -133,4 +155,3 @@ public class MonthlyReportFragment extends Fragment {
         return result;
     }
 }
-
