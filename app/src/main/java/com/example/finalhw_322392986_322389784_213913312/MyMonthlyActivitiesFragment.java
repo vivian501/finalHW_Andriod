@@ -3,9 +3,8 @@ package com.example.finalhw_322392986_322389784_213913312;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.Log;
+import android.view.*;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,18 +17,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.ActivityAdapter;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.*;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MyMonthlyActivitiesFragment extends Fragment {
+
     private RecyclerView recyclerView;
     private TextView title;
     private Student currentStudent;
-    private List<Activity> allActivities;
+    private List<Activity> allActivities = new ArrayList<>();
+    private ActivityAdapter adapter;
 
     @SuppressLint("WrongViewCast")
     @Nullable
@@ -41,15 +40,51 @@ public class MyMonthlyActivitiesFragment extends Fragment {
         recyclerView = view.findViewById(R.id.monthlyActivitiesRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        currentStudent = DummyDataProvider.getDummyStudent(); // Replace with real logic (firebase)
-        allActivities = DummyDataProvider.getDummyActivities(); // Replace with real logic (firebase)
+        fetchCurrentStudent();
 
+        return view;
+    }
+
+    // Fetch current logged-in student data from Firebase
+    private void fetchCurrentStudent() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore.getInstance().collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    currentStudent = doc.toObject(Student.class);
+                    if (currentStudent != null) {
+                        currentStudent.setUid(doc.getId());
+                        fetchAllActivities();
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("FETCH_STUDENT", "Failed to fetch student", e));
+    }
+
+    // Fetch all activities from Firebase
+    private void fetchAllActivities() {
+        FirebaseFirestore.getInstance().collection("activities")
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    allActivities.clear();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Activity activity = doc.toObject(Activity.class);
+                        if (activity != null) {
+                            activity.setActivityId(doc.getId());
+                            allActivities.add(activity);
+                        }
+                    }
+                    setupRecycler();
+                })
+                .addOnFailureListener(e -> Log.e("FETCH_ACTIVITIES", "Failed to fetch activities", e));
+    }
+
+    private void setupRecycler() {
         List<Activity> monthlyActivities = getActivitiesJoinedThisMonth(currentStudent, allActivities);
-
-        ActivityAdapter adapter = new ActivityAdapter(monthlyActivities, AdapterMode.EDIT);
+        adapter = new ActivityAdapter(monthlyActivities, AdapterMode.EDIT);
 
         // this method is for deleting an activity from the list of joined activities for this month
-        //it also deletes the activity from the students registered activities list
+        // it also deletes the activity from the students registered activities list
         // it uses a listener and displays feedback and an alert dialog to confirm the users actions
         adapter.setOnDeleteClickListener(activity -> {
             String activityId = activity.getActivityId();
@@ -64,11 +99,25 @@ public class MyMonthlyActivitiesFragment extends Fragment {
                             .setPositiveButton("Yes", (dialog, which) -> {
                                 currentStudent.getRegisteredActivityIds().remove(activityId);
                                 joinDates.remove(activityId);
-                                Toast.makeText(requireContext(), "Activity removed", Toast.LENGTH_SHORT).show();
 
-                                // Refresh list
-                                List<Activity> updatedList = getActivitiesJoinedThisMonth(currentStudent, allActivities);
-                                adapter.updateActivityList(updatedList);
+                                // Update Firebase with new data (removes the activity from the lists)
+                                FirebaseFirestore.getInstance().collection("users")
+                                        .document(currentStudent.getUid())
+                                        .update(
+                                                "registeredActivityIds", currentStudent.getRegisteredActivityIds(),
+                                                "joinedActivityDates", currentStudent.getJoinedActivityDates()
+                                        )
+                                        .addOnSuccessListener(unused -> {
+                                            Toast.makeText(requireContext(), "Activity removed", Toast.LENGTH_SHORT).show();
+                                            List<Activity> updatedList = getActivitiesJoinedThisMonth(currentStudent, allActivities);
+                                            adapter.updateActivityList(updatedList);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(requireContext(), "Failed to update student in Firestore", Toast.LENGTH_SHORT).show();
+                                            Log.e("FIRESTORE_UPDATE", "Error updating student document", e);
+                                        });
+
+
                             })
                             .setNegativeButton("No", null)
                             .show();
@@ -78,9 +127,7 @@ public class MyMonthlyActivitiesFragment extends Fragment {
             }
         });
 
-
         recyclerView.setAdapter(adapter);
-        return view;
     }
 
     private List<Activity> getActivitiesJoinedThisMonth(Student student, List<Activity> allActivities) {
