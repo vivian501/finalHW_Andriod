@@ -13,9 +13,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.example.finalhw_322392986_322389784_213913312.logic_model.Student;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GeneralReportFragment extends Fragment {
 
@@ -23,7 +24,7 @@ public class GeneralReportFragment extends Fragment {
     private ProgressBar scienceProgress, socialProgress, creativityProgress, ratingProgress;
 
     private Student currentStudent;
-    private List<Activity> allActivities;
+    private List<Activity> allActivities = new ArrayList<>();
 
     @Nullable
     @Override
@@ -40,12 +41,37 @@ public class GeneralReportFragment extends Fragment {
 
         activityCountLabel.setText("Number Of Activities Joined");
 
-        currentStudent = DummyDataProvider.getDummyStudent();
-        allActivities = DummyDataProvider.getDummyActivities();
-
-        updateReport(view);
+        loadStudentAndActivities(view);
 
         return view;
+    }
+
+    private void loadStudentAndActivities(View view) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // First load the student
+        db.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    currentStudent = documentSnapshot.toObject(Student.class);
+                    if (currentStudent != null) {
+                        currentStudent.setUid(uid);
+                        // Now load all activities
+                        db.collection("activities")
+                                .get()
+                                .addOnSuccessListener(activitySnapshot -> {
+                                    for (DocumentSnapshot doc : activitySnapshot) {
+                                        Activity activity = doc.toObject(Activity.class);
+                                        if (activity != null) {
+                                            activity.setActivityId(doc.getId());
+                                            allActivities.add(activity);
+                                        }
+                                    }
+                                    updateReport(view);
+                                });
+                    }
+                });
     }
 
     private void updateReport(View view) {
@@ -69,7 +95,6 @@ public class GeneralReportFragment extends Fragment {
         int total = science + social + creativity;
         if (total == 0) total = 1; // prevent division by 0 and ensure max is not 0
 
-        // Safely set max and progress
         scienceProgress.setMax(total);
         socialProgress.setMax(total);
         creativityProgress.setMax(total);
