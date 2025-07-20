@@ -35,7 +35,7 @@ import java.util.Map;
 public class CreateNewActivityFragment extends Fragment {
 
     private EditText titleEditText, descriptionEditText,
-           maxParticipantsEditText,
+            maxParticipantsEditText,
             daysEditText, startDateEditText, endDateEditText;
     private CheckBox mondayCheckbox, tuesdayCheckbox, wednesdayCheckbox, thursdayCheckbox,
             fridayCheckbox, saturdayCheckbox, sundayCheckbox;

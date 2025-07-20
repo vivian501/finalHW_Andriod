@@ -28,7 +28,7 @@ import androidx.fragment.app.Fragment;
             // Navigate to the fragment that shows activities the guide can rate
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, new GuidesActivitiesStudents())
+                    .replace(R.id.fragment_container, new ParentsActivitiesStudents())
                     .addToBackStack(null)
                     .commit();
         });
