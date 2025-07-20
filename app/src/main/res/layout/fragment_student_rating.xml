@@ -7,16 +7,30 @@
     android:layout_height="match_parent"
     tools:context=".RateStudentsFragment">
 
+    <!-- Save Button at the top -->
+    <Button
+        android:id="@+id/saveAllButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:backgroundTint="@color/green"
+        android:text="@string/saveAllRatings"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- RecyclerView fills the rest -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/studentRecycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:padding="8dp"
-        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/student_rating_item"
+        app:layout_constraintTop_toBottomOf="@id/saveAllButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/student_rating_item" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

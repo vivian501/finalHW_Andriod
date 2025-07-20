@@ -92,6 +92,7 @@
     <string name="minimumAge">Minimum Age</string>
     <string name="maximumAge">Maximum Age</string>
     <string name="selectDays">Select Days:</string>
+    <string name="saveAllRatings">Save All Ratings</string>
     <string-array name="studentAge">
         <item>12</item>
         <item>13</item>

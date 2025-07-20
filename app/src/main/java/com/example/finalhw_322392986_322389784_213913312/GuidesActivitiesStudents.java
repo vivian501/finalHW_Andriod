@@ -76,10 +76,12 @@ public class GuidesActivitiesStudents extends Fragment {
                 .addOnSuccessListener(snapshot -> {
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         Student student = doc.toObject(Student.class);
-                        if (student != null &&
-                                student.getRegisteredActivityIds() != null &&
-                                student.getRegisteredActivityIds().contains(activityId)) {
-                            result.add(student);
+                        if (student != null) {
+                            student.setUid(doc.getId()); //  Set UID from document ID
+                            if (student.getRegisteredActivityIds() != null &&
+                                    student.getRegisteredActivityIds().contains(activityId)) {
+                                result.add(student);
+                            }
                         }
                     }
                     callback.accept(result);
@@ -115,11 +117,10 @@ public class GuidesActivitiesStudents extends Fragment {
     }
 
 
-    /**
-     * Filters and returns activities that are:
-     * - Assigned to the currently logged-in guide
-     * - Have already started (start date <= current date)
-     */
+
+     //Filters and returns activities that are:
+     // Assigned to the currently logged-in guide
+     // Have already started (start date <= current date)
     private List<Activity> getActivitiesForCurrentGuide() {
         List<Activity> result = new ArrayList<>();
         Date now = new Date();
@@ -135,9 +136,8 @@ public class GuidesActivitiesStudents extends Fragment {
         return result;
     }
 
-    /**
-     * Returns the list of students who are registered to a given activity ID.
-     */
+
+      //Returns the list of students who are registered to a given activity ID.
     private List<Student> getStudentsRegisteredForActivity(String activityId) {
         List<Student> result = new ArrayList<>();
 
