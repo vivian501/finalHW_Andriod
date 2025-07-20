@@ -128,7 +128,7 @@ public class ParentsActivitiesStudents extends Fragment {
         adapter.setOnRateClickListener(activity -> {
             List<Student> joinedStudents = activityToStudentsMap.getOrDefault(activity.getActivityId(), new ArrayList<>());
 
-            RateStudentsFragment fragment = RateStudentsFragment.newInstance(activity.getActivityId(), joinedStudents);
+            ParentsRateStudentsFragment fragment = ParentsRateStudentsFragment.newInstance(activity.getActivityId(), joinedStudents);
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)
