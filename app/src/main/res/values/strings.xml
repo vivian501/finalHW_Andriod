@@ -105,5 +105,7 @@
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="commentRepl"><![CDATA[View Comments & Reply]]></string>
+    <string name="nocomments">No Comments Found</string>
 
 </resources>
