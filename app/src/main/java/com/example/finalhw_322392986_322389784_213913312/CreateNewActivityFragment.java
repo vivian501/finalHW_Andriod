@@ -12,12 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.finalhw_322392986_322389784_213913312.logic_model.Activity;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,6 +47,10 @@ public class CreateNewActivityFragment extends Fragment {
     private FirebaseAuth auth;
 
     private Map<String, String> guideNameToUid = new HashMap<>();
+
+    private boolean isEditMode = false;
+    private String activityIdToEdit = null;
+    private Activity existingActivity = null;
 
 
     @Nullable
@@ -130,6 +136,15 @@ public class CreateNewActivityFragment extends Fragment {
                         Toast.makeText(getContext(), "Failed to load guides: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
 
+        if (getArguments() != null) {
+            isEditMode = getArguments().getBoolean("isEditMode", false);
+            activityIdToEdit = getArguments().getString("activityId", null);
+
+            if (isEditMode && activityIdToEdit != null) {
+                loadActivityForEdit(activityIdToEdit);
+            }
+        }
+
 
         Map<String, List<String>> domainMap = new HashMap<>();
         domainMap.put("Science", Arrays.asList("biology", "robotics", "physics", "math"));
@@ -172,6 +187,72 @@ public class CreateNewActivityFragment extends Fragment {
     }
 
 
+    private void loadActivityForEdit(String activityId) {
+        FirebaseFirestore.getInstance()
+                .collection("activities")
+                .document(activityId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        existingActivity = documentSnapshot.toObject(Activity.class);
+                        if (existingActivity != null) {
+                            populateFields(existingActivity);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to load activity.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void populateFields(Activity activity) {
+        titleEditText.setText(activity.getName());
+        descriptionEditText.setText(activity.getDescription());
+        maxParticipantsEditText.setText(String.valueOf(activity.getMaxParticipants()));
+
+        // Select domain and subdomain
+        setSpinnerSelection(domainSpinner, activity.getDomain());
+        setSpinnerSelection(subDomainSpinner, activity.getSubDomain());
+
+        // Select min and max age
+        setSpinnerSelection(minAgeSpinner, String.valueOf(activity.getMinAge()));
+        setSpinnerSelection(maxAgeSpinner, String.valueOf(activity.getMaxAge()));
+
+        // Select guide
+        setSpinnerSelection(guideSpinner, activity.getGuideFullName());
+
+        // Set days checkboxes
+        List<String> selectedDays = activity.getDays();
+        if (selectedDays != null) {
+            mondayCheckbox.setChecked(selectedDays.contains("Monday"));
+            tuesdayCheckbox.setChecked(selectedDays.contains("Tuesday"));
+            wednesdayCheckbox.setChecked(selectedDays.contains("Wednesday"));
+            thursdayCheckbox.setChecked(selectedDays.contains("Thursday"));
+            fridayCheckbox.setChecked(selectedDays.contains("Friday"));
+            saturdayCheckbox.setChecked(selectedDays.contains("Saturday"));
+            sundayCheckbox.setChecked(selectedDays.contains("Sunday"));
+        }
+
+        // Set dates (assume they're strings already or convert them)
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        startDateEditText.setText(sdf.format(activity.getStartDate()));
+        endDateEditText.setText(sdf.format(activity.getEndDate()));
+
+    }
+
+
+    private void setSpinnerSelection(Spinner spinner, String value) {
+        SpinnerAdapter adapter = spinner.getAdapter();
+        if (adapter == null || value == null) return;
+
+        for (int i = 0; i < adapter.getCount(); i++) {
+            if (value.equals(adapter.getItem(i).toString())) {
+                spinner.setSelection(i);
+                return;
+            }
+        }
+    }
+
     private void saveActivity() {
         String title = titleEditText.getText().toString().trim();
         String selectedDomain = domainSpinner.getSelectedItem().toString();
@@ -183,9 +264,6 @@ public class CreateNewActivityFragment extends Fragment {
         String guideName = guideSpinner.getSelectedItem().toString();
         String guideUid = guideNameToUid.get(guideName);
 
-
-
-
         List<String> selectedDays = new ArrayList<>();
         if (mondayCheckbox.isChecked()) selectedDays.add("Monday");
         if (tuesdayCheckbox.isChecked()) selectedDays.add("Tuesday");
@@ -195,61 +273,56 @@ public class CreateNewActivityFragment extends Fragment {
         if (saturdayCheckbox.isChecked()) selectedDays.add("Saturday");
         if (sundayCheckbox.isChecked()) selectedDays.add("Sunday");
 
-
-
-
-
         String startDateStr = startDateEditText.getText().toString().trim();
         String endDateStr = endDateEditText.getText().toString().trim();
 
-        if (TextUtils.isEmpty(title) ) {
+        if (TextUtils.isEmpty(title)) {
             Toast.makeText(getContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
         HashMap<String, Object> activity = new HashMap<>();
         activity.put("name", title);
-        activity.put("domain", selectedDomain );
-        activity.put("subDomain",selectedSubdomain);
+        activity.put("domain", selectedDomain);
+        activity.put("subDomain", selectedSubdomain);
         activity.put("description", description);
         activity.put("minAge", minAge);
         activity.put("maxAge", maxAge);
         activity.put("maxParticipants", Integer.parseInt(maxParticipants));
         activity.put("guideFullName", guideName);
-        activity.put("guideId", guideUid);  //  Store UID for logic
+        activity.put("guideId", guideUid);
         activity.put("days", selectedDays);
         activity.put("createdBy", auth.getCurrentUser().getUid());
+        activity.put("startDate", startDateStr);
+        activity.put("endDate", endDateStr);
 
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date start = sdf.parse(startDateStr);
-            Date end = sdf.parse(endDateStr);
-            activity.put("startDate", new Timestamp(start));
-            activity.put("endDate", new Timestamp(end));
-        } catch (ParseException e) {
-            Toast.makeText(getContext(), "Invalid date format", Toast.LENGTH_SHORT).show();
-            return;
+        // 🔁 UPDATE mode
+        if (isEditMode && activityIdToEdit != null) {
+            db.collection("activities")
+                    .document(activityIdToEdit)
+                    .update(activity)
+                    .addOnSuccessListener(unused -> {
+                        Toast.makeText(getContext(), "Activity updated", Toast.LENGTH_SHORT).show();
+                        requireActivity().onBackPressed();
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(getContext(), "Update failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         }
-
-        db.collection("activities")
-                .add(activity)
-                .addOnSuccessListener(docRef -> {
-                    String activityId = docRef.getId();  // Get the auto-generated activity ID
-
-                    // Add the activity ID to the guide's assignedActivityIds list
-                    db.collection("users")
-                            .document(guideUid)
-                            .update("assignedActivityIds", com.google.firebase.firestore.FieldValue.arrayUnion(activityId))
-                            .addOnSuccessListener(unused -> {
-                                Toast.makeText(getContext(), "Activity saved and assigned to guide!", Toast.LENGTH_SHORT).show();
-                                requireActivity().getSupportFragmentManager().popBackStack();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(getContext(), "Activity saved but failed to update guide: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            });
-                })
-
-                .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
+        // ➕ CREATE mode
+        else {
+            db.collection("activities")
+                    .add(activity)
+                    .addOnSuccessListener(docRef -> {
+                        String activityId = docRef.getId();
+                        db.collection("users")
+                                .document(guideUid)
+                                .update("assignedActivityIds", com.google.firebase.firestore.FieldValue.arrayUnion(activityId));
+                        Toast.makeText(getContext(), "Activity created", Toast.LENGTH_SHORT).show();
+                        requireActivity().onBackPressed();
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(getContext(), "Creation failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        }
     }
+
 }
